@@ -1,0 +1,76 @@
+.templates-page {
+    padding: var(--spacing-md);
+}
+
+.templates-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.templates-back-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-main);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    margin-left: calc(-1 * var(--spacing-sm));
+    display: flex;
+    align-items: center;
+}
+
+.templates-title {
+    margin: 0;
+    font-size: var(--font-2xl);
+}
+
+.templates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.template-card {
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.template-card-info {
+    flex: 1;
+    padding-right: var(--spacing-md);
+}
+
+.template-card-name {
+    margin: 0 0 4px 0;
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.template-card-meta {
+    margin: 0;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+}
+
+.template-start-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 8px var(--spacing-md);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--font-sm);
+    flex-shrink: 0;
+}
+
+.template-start-btn:hover {
+    background: var(--color-primary-hover);
+}

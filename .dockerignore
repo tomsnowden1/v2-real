@@ -1,0 +1,9 @@
+node_modules
+dist
+.env.local
+*.local
+.git
+.DS_Store
+test-browser.js
+docs
+nginx.conf

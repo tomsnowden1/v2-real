@@ -1,0 +1,55 @@
+.superset-container {
+    display: flex;
+    margin-bottom: var(--spacing-md);
+    position: relative;
+}
+
+.superset-indicator {
+    width: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-right: 8px;
+    padding-top: 16px;
+    padding-bottom: 32px;
+}
+
+.superset-line {
+    position: absolute;
+    top: 32px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+}
+
+.superset-icon-badge {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-full);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: var(--shadow-sm);
+}
+
+.superset-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.superset-container .exercise-card {
+    margin-bottom: var(--spacing-sm);
+}
+
+.superset-container .exercise-card:last-child {
+    margin-bottom: 0;
+}

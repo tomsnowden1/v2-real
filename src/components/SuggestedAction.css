@@ -1,0 +1,101 @@
+.suggested-action-card {
+    margin-top: var(--spacing-sm);
+    border: 1px solid var(--color-primary);
+    background-color: var(--color-bg);
+    overflow: hidden;
+}
+
+.sa-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: rgba(30, 189, 123, 0.05);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sa-icon {
+    color: var(--color-primary);
+    background-color: rgba(30, 189, 123, 0.2);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    width: 32px;
+    height: 32px;
+}
+
+.sa-title-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.sa-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.sa-title {
+    margin: 0;
+    font-size: 16px;
+    color: var(--color-text-main);
+    font-weight: 600;
+}
+
+.sa-exercises {
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.sa-exercise-row {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.sa-exercise-row:last-child {
+    border-bottom: none;
+}
+
+.sa-ex-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-main);
+}
+
+.sa-ex-details {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-family: monospace;
+    margin-top: 2px;
+}
+
+.sa-ex-notes {
+    font-size: 12px;
+    color: #8b5cf6;
+    /* distinct color for coach notes */
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.sa-apply-btn {
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    transition: opacity 0.2s;
+}
+
+.sa-apply-btn:active {
+    opacity: 0.8;
+}

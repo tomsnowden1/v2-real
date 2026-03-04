@@ -1,0 +1,315 @@
+/* AI Settings Page */
+.ai-settings-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 16px 100px;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 20px;
+}
+
+.settings-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-main);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.header-icon {
+    color: var(--color-primary);
+}
+
+/* Form Layout */
+.settings-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-section {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.section-title h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.section-icon {
+    color: var(--color-primary);
+}
+
+.section-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+    line-height: 1.5;
+}
+
+/* Inputs */
+.input-group-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.input-group-col label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.settings-select,
+.settings-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-main);
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.settings-select:focus,
+.settings-input:focus {
+    border-color: var(--color-primary);
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.input-icon-left {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.settings-input.has-icon {
+    padding-left: 40px;
+}
+
+/* Budget Input */
+.budget-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 14px;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.budget-input {
+    padding-left: 28px;
+}
+
+/* Help Links */
+.help-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.help-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.help-link:hover {
+    text-decoration: underline;
+}
+
+/* Video Tutorial */
+.video-tutorial-container {
+    margin-top: 20px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+}
+
+.video-tutorial-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0 0 10px;
+}
+
+.video-embed-placeholder {
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+}
+
+/* Usage Meter */
+.usage-meter-container {
+    margin-top: 16px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+}
+
+.usage-meter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.usage-label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.usage-amount {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    font-variant-numeric: tabular-nums;
+}
+
+.usage-amount.warning {
+    color: #f59e0b;
+}
+
+.usage-amount.exceeded {
+    color: #ef4444;
+}
+
+.usage-bar-bg {
+    height: 8px;
+    border-radius: 100px;
+    background: var(--color-border);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.usage-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: var(--color-primary);
+    transition: width 0.4s ease, background 0.3s;
+}
+
+.usage-bar-fill.warning {
+    background: #f59e0b;
+}
+
+.usage-bar-fill.exceeded {
+    background: #ef4444;
+}
+
+.budget-exceeded-message {
+    font-size: 12px;
+    color: #ef4444;
+    font-weight: 600;
+    margin: 4px 0 8px;
+}
+
+.budget-warning-message {
+    font-size: 12px;
+    color: #f59e0b;
+    font-weight: 600;
+    margin: 4px 0 8px;
+}
+
+.reset-usage-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.reset-usage-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* Save Actions */
+.settings-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 0;
+}
+
+.save-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.save-btn:active {
+    transform: scale(0.97);
+}
+
+.save-btn.success {
+    background: #22c55e;
+}
+
+.save-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0;
+    text-align: center;
+}

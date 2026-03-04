@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install)",
+      "Bash(npm install --prefix \"/Users/jess/v2 /server\")",
+      "Bash(lsof -ti:5173,5174)",
+      "Bash(kill 48719 51667)",
+      "Bash(npm run build)"
+    ]
+  }
+}

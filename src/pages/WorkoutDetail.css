@@ -1,0 +1,408 @@
+/* ── Workout Detail Page ─────────────────────────────────────────── */
+.wd-page {
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+.wd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.wd-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wd-back-link {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ── Content area ────────────────────────────────────────────────── */
+.wd-content {
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ── Banner ──────────────────────────────────────────────────────── */
+.wd-banner {
+    padding: var(--spacing-lg);
+}
+
+.wd-banner-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.wd-banner-stats {
+    display: flex;
+    gap: var(--spacing-xl);
+}
+
+.wd-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wd-stat svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.wd-stat div {
+    display: flex;
+    flex-direction: column;
+}
+
+.wd-stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1.2;
+}
+
+.wd-stat-label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* ── Score Card ──────────────────────────────────────────────────── */
+.wd-score-card {
+    padding: var(--spacing-lg);
+}
+
+.wd-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 var(--spacing-md);
+    color: var(--color-text-main);
+}
+
+.wd-score-layout {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.wd-sub-scores {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wd-score-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wd-score-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wd-score-bar-label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.wd-score-bar-value {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.wd-score-bar-track {
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--color-border);
+    overflow: hidden;
+}
+
+.wd-score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+/* ── Exercise Card ───────────────────────────────────────────────── */
+.wd-exercise-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.wd-ex-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.wd-ex-index {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wd-ex-name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wd-ex-vol {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* ── Sets Table ──────────────────────────────────────────────────── */
+.wd-sets-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.wd-sets-row {
+    display: flex;
+    align-items: center;
+    padding: 10px var(--spacing-lg);
+    font-size: 14px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.wd-sets-row:last-child {
+    border-bottom: none;
+}
+
+.wd-sets-header-row {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--color-bg);
+}
+
+.wd-set-skipped {
+    opacity: 0.45;
+}
+
+.wd-set-col-num {
+    width: 36px;
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+.wd-set-col-type {
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.wd-set-col-weight {
+    flex: 1;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.wd-set-col-reps {
+    width: 60px;
+    text-align: right;
+    font-weight: 500;
+    color: var(--color-text-main);
+}
+
+/* ── Set Type Badges ─────────────────────────────────────────────── */
+.wd-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-align: center;
+    display: inline-block;
+    line-height: 1.6;
+}
+
+.wd-badge-normal {
+    background: rgba(30, 189, 123, 0.12);
+    color: var(--color-primary);
+}
+
+.wd-badge-warmup {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.wd-badge-drop {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.wd-badge-failure {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+/* ── Delete Button ───────────────────────────────────────────────── */
+.wd-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: var(--spacing-md);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: #ef4444;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wd-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: #ef4444;
+}
+
+/* ── Delete Confirmation Modal ───────────────────────────────────── */
+.wd-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    animation: wd-fade-in 0.15s ease;
+}
+
+@keyframes wd-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.wd-modal {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: wd-slide-up 0.2s ease;
+}
+
+@keyframes wd-slide-up {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.wd-modal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 8px;
+}
+
+.wd-modal p {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--spacing-lg);
+    line-height: 1.5;
+}
+
+.wd-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.wd-modal-cancel,
+.wd-modal-delete {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s ease;
+}
+
+.wd-modal-cancel {
+    background: var(--color-bg);
+    color: var(--color-text-main);
+}
+
+.wd-modal-cancel:hover {
+    background: var(--color-border);
+}
+
+.wd-modal-delete {
+    background: #ef4444;
+    color: #fff;
+}
+
+.wd-modal-delete:hover {
+    background: #dc2626;
+}

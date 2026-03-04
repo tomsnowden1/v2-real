@@ -1,0 +1,170 @@
+.gym-page {
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    padding-bottom: 80px;
+    /* spacing for bottom nav */
+}
+
+.gym-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--color-surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.gym-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.create-btn {
+    color: var(--color-primary);
+    padding: 8px;
+    margin-right: -8px;
+}
+
+.gym-content {
+    padding: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.gym-desc {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.5;
+}
+
+.create-form {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.gym-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg);
+    font-size: 16px;
+    color: var(--color-text-main);
+}
+
+.gym-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+}
+
+.cancel-btn,
+.save-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+}
+
+.cancel-btn {
+    color: var(--color-text-muted);
+}
+
+.save-btn {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.gym-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.gym-card {
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gym-card-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.gym-icon-wrapper {
+    background-color: rgba(30, 189, 123, 0.1);
+    color: var(--color-primary);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gym-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gym-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.gym-equip-count {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.gym-card-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.delete-btn:hover {
+    color: #ef4444;
+    background-color: #fee2e2;
+}
+
+.nav-btn {
+    color: var(--color-text-muted);
+}
+
+.add-first-btn {
+    margin-top: var(--spacing-md);
+    background-color: var(--color-primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.empty-icon {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-border);
+}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background: IronAI mint green, squircle shape -->
+  <rect width="512" height="512" rx="114" fill="#1ebd7b"/>
+
+  <!-- Barbell bar (horizontal center) -->
+  <rect x="148" y="238" width="216" height="36" rx="8" fill="white"/>
+
+  <!-- Left collar -->
+  <rect x="100" y="208" width="52" height="96" rx="9" fill="white"/>
+
+  <!-- Left weight plate (slightly transparent for depth) -->
+  <rect x="64" y="180" width="40" height="152" rx="9" fill="rgba(255,255,255,0.88)"/>
+
+  <!-- Right collar -->
+  <rect x="360" y="208" width="52" height="96" rx="9" fill="white"/>
+
+  <!-- Right weight plate -->
+  <rect x="408" y="180" width="40" height="152" rx="9" fill="rgba(255,255,255,0.88)"/>
+</svg>

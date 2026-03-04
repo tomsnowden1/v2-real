@@ -1,0 +1,397 @@
+/* ── ReviewCard — Post-Workout Review Card ──────────────────────────────── */
+
+.review-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    width: 100%;
+    max-width: 480px;
+    font-size: var(--font-sm);
+}
+
+/* ── Pending ── */
+.review-card--pending {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-align: center;
+}
+
+.review-card__pending-icon {
+    font-size: 2rem;
+    animation: review-pulse 1.5s ease-in-out infinite;
+}
+
+.review-card__pending-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.review-card__pending-sub {
+    color: var(--color-text-muted);
+    font-size: var(--font-xs);
+    margin: 0;
+}
+
+.review-card__pending-dots {
+    display: flex;
+    gap: 6px;
+    margin-top: var(--spacing-xs);
+}
+
+.review-card__pending-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    animation: review-bounce 1.2s ease-in-out infinite;
+}
+
+.review-card__pending-dots span:nth-child(2) { animation-delay: 0.2s; }
+.review-card__pending-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes review-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes review-bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+}
+
+/* ── Error ── */
+.review-card--error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-align: center;
+}
+
+.review-card__error-icon {
+    color: #ef4444;
+}
+
+.review-card__error-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.review-card__error-sub {
+    color: var(--color-text-muted);
+    font-size: var(--font-xs);
+    margin: 0;
+}
+
+.review-card__retry-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--spacing-sm);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+/* ── Complete ── */
+.review-card--complete {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.review-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.review-card__header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.review-card__badge {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-primary);
+}
+
+.review-card__trend {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+}
+
+.review-card__score {
+    font-size: var(--font-2xl);
+    font-weight: 800;
+    color: var(--color-primary);
+    line-height: 1;
+}
+
+.review-card__score span {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+/* ── Summary ── */
+.review-card__summary {
+    margin: 0;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm) calc(var(--spacing-md) + 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid var(--color-border);
+    list-style: disc;
+}
+
+.review-card__summary li {
+    color: var(--color-text);
+    font-size: var(--font-sm);
+    line-height: 1.4;
+}
+
+/* ── Sections ── */
+.review-card__section {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.review-card__section:last-child {
+    border-bottom: none;
+}
+
+.review-card__section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Section colour accents */
+.review-card__section--prs .review-card__section-header  { color: #f59e0b; }
+.review-card__section--wins .review-card__section-header { color: #22c55e; }
+.review-card__section--issues .review-card__section-header { color: #f59e0b; }
+.review-card__section--week .review-card__section-header  { color: var(--color-primary); }
+.review-card__section--goal .review-card__section-header  { color: var(--color-primary); }
+.review-card__section--takeaways .review-card__section-header { color: var(--color-text-muted); }
+
+/* ── PR rows ── */
+.review-card__pr-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.review-card__pr-label {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: var(--font-sm);
+}
+
+.review-card__pr-value {
+    font-weight: 700;
+    color: #f59e0b;
+    font-size: var(--font-sm);
+}
+
+.review-card__pr-context {
+    width: 100%;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* ── List (wins, goal) ── */
+.review-card__list {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.review-card__list li {
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+/* ── Issues ── */
+.review-card__issue {
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.review-card__issue:last-child { margin-bottom: 0; }
+
+.review-card__issue-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 4px;
+    font-size: var(--font-sm);
+}
+
+.review-card__issue-evidence,
+.review-card__issue-cause,
+.review-card__issue-fix {
+    margin: 0 0 2px;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+.review-card__issue-fix {
+    color: var(--color-text);
+}
+
+/* ── Week bar ── */
+.review-card__week-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.review-card__week-pct {
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.review-card__week-bar {
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.review-card__week-bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.review-card__week-next {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 6px 0 0;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+}
+
+/* ── Takeaway chips ── */
+.review-card__takeaways-sub {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--spacing-xs);
+}
+
+.review-card__takeaway-chip {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.review-card__takeaway-chip:last-child { margin-bottom: 0; }
+
+.review-card__takeaway-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.review-card__takeaway-category {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.review-card__takeaway-conf {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.review-card__takeaway-conf--high { background: rgba(34,197,94,0.15); color: #22c55e; }
+.review-card__takeaway-conf--med  { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.review-card__takeaway-conf--low  { background: rgba(148,163,184,0.15); color: var(--color-text-muted); }
+
+.review-card__takeaway-statement {
+    font-size: var(--font-sm);
+    color: var(--color-text);
+    margin: 0 0 var(--spacing-xs);
+    line-height: 1.4;
+}
+
+.review-card__takeaway-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.review-card__takeaway-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.review-card__takeaway-btn--save {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.review-card__takeaway-btn--dismiss {
+    background: transparent;
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+}
+
+.review-card__takeaway-saved {
+    font-size: var(--font-xs);
+    font-weight: 600;
+    color: #22c55e;
+}

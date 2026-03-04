@@ -1,0 +1,209 @@
+.history-page {
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.history-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.history-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ── Segmented Control ─────────────────────────────────────────── */
+.history-segmented-control {
+    display: flex;
+    align-items: center;
+    background: var(--color-border, #e8eaed);
+    border-radius: 14px;
+    padding: 4px;
+    margin: 12px 16px 4px;
+    gap: 2px;
+    position: sticky;
+    top: 60px;
+    z-index: 9;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.segment-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.segment-btn svg {
+    flex-shrink: 0;
+    transition: color 0.18s ease;
+}
+
+.segment-btn:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-main, #1a1a2e);
+}
+
+.segment-btn.active {
+    background: var(--color-surface, #ffffff);
+    color: var(--color-primary, #4f46e5);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+}
+
+.segment-btn.active svg {
+    color: var(--color-primary, #4f46e5);
+}
+
+/* ── History List ──────────────────────────────────────────────── */
+.history-list {
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.history-card {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.history-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.history-card:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.hc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.hc-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.hc-date {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.hc-metrics {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.hc-metric {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-text-main);
+    font-weight: 500;
+}
+
+.hc-metric svg {
+    color: var(--color-primary);
+}
+
+.hc-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hc-exercise-row {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.hc-ex-sets {
+    width: 30px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.hc-ex-name {
+    flex: 1;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: var(--spacing-md);
+}
+
+.hc-ex-best {
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.hc-exercise-overflow {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* ── Empty State ──────────────────────────────────────────────── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 24px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 15px;
+}
+
+.empty-icon {
+    opacity: 0.35;
+}
+
+/* ── Trends wrapper ───────────────────────────────────────────── */
+.history-trends {
+    padding: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}

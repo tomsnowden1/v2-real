@@ -1,0 +1,367 @@
+.workout-page {
+    min-height: 100vh;
+    background-color: var(--color-bg);
+}
+
+.workout-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-nav);
+    background-color: var(--color-surface);
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.workout-title-container {
+    flex: 1;
+}
+
+.workout-title-input {
+    font-size: var(--font-xl);
+    font-weight: 700;
+    color: var(--color-text-main);
+    border: none;
+    background: transparent;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.workout-title-input:focus {
+    outline: none;
+}
+
+.workout-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--font-xs);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.timer {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-bg);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.finish-btn {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s;
+}
+
+.finish-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.workout-body {
+    padding: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.add-exercise-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: rgba(30, 189, 123, 0.1);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+}
+
+.add-exercise-btn:hover {
+    background-color: rgba(30, 189, 123, 0.15);
+}
+
+.cancel-workout-btn {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 14px;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: #ef4444;
+    background-color: transparent;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+}
+
+.cancel-workout-btn:hover {
+    background-color: #fee2e2;
+}
+
+/* ── Inline Style Migrations ── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    margin-bottom: 20px;
+}
+
+.empty-state-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.empty-state-description {
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+}
+
+.start-workout-btn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.play-icon-inline {
+    margin-right: 4px;
+}
+
+.exercises-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+}
+
+.exercises-list-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.save-template-btn {
+    flex: 1;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+}
+
+.cancel-btn-inline {
+    flex: 1;
+    margin-top: 0;
+}
+
+.page-spacer {
+    padding-bottom: 80px;
+}
+
+/* ── Modal Review Overlay ── */
+.review-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.review-modal-sheet {
+    background: var(--color-surface);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 20px 48px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.review-loading {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.review-emoji {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.review-loading-text {
+    color: var(--color-text-muted);
+    font-size: 15px;
+}
+
+.review-loading-subtext {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.review-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.review-flag {
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.review-score-badge {
+    background: var(--color-primary);
+    color: white;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.review-prs {
+    margin-bottom: 20px;
+    background: rgba(255, 215, 0, 0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.review-prs-title {
+    margin: 0 0 10px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #f5c842;
+}
+
+.review-pr-item {
+    margin: 4px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-main);
+}
+
+.review-wins {
+    margin-bottom: 16px;
+}
+
+.review-wins-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--color-primary);
+}
+
+.review-win-item {
+    margin: 4px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-main);
+    padding-left: 12px;
+    border-left: 2px solid var(--color-primary);
+}
+
+.review-fails {
+    margin-bottom: 16px;
+}
+
+.review-fails-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #e57373;
+}
+
+.review-fail-item {
+    margin: 4px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-main);
+    padding-left: 12px;
+    border-left: 2px solid #e57373;
+}
+
+.review-alternates {
+    margin-bottom: 16px;
+}
+
+.review-alternates-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #64b5f6;
+}
+
+.review-alternate-item {
+    margin: 4px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-main);
+    padding-left: 12px;
+    border-left: 2px solid #64b5f6;
+}
+
+.review-next-session {
+    margin-bottom: 24px;
+    background: var(--color-bg);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+
+.review-next-session-title {
+    margin: 0 0 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.review-next-session-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-main);
+}
+
+.review-footer-text {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.review-done-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}

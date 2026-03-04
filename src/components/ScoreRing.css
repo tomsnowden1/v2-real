@@ -1,0 +1,60 @@
+.score-ring-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-ring-svg {
+    transform: rotate(-90deg);
+    /* Start at 12 o'clock */
+}
+
+.score-ring-bg {
+    stroke: var(--color-border);
+}
+
+.score-ring-progress {
+    transition: stroke-dashoffset 1s ease-out, stroke 0.3s ease;
+}
+
+.score-ring-content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-ring-value {
+    font-weight: 600;
+    line-height: 1;
+}
+
+.score-ring-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Color Thresholds */
+.score-excellent {
+    stroke: #10B981;
+    /* Emerald green */
+    color: #10B981;
+}
+
+.score-good {
+    stroke: #F59E0B;
+    /* Amber/Yellow for passing but not improving */
+    color: #F59E0B;
+}
+
+.score-needs-work {
+    stroke: #EF4444;
+    /* Red for dropped sessions or poor quality */
+    color: #EF4444;
+}

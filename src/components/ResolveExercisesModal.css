@@ -1,0 +1,194 @@
+.resolve-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    /* Bottom sheet on mobile */
+    animation: fadeIn 0.2s ease-out;
+}
+
+@media (min-width: 768px) {
+    .resolve-modal-overlay {
+        align-items: center;
+        padding: var(--spacing-md);
+    }
+}
+
+.resolve-modal-content {
+    background: var(--color-surface);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+    .resolve-modal-content {
+        border-radius: 16px;
+    }
+}
+
+.resolve-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.resolve-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.resolve-title h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.icon-warning {
+    color: #f59e0b;
+    /* amber for warnings */
+}
+
+.resolve-body {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.resolve-desc {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.resolve-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.resolve-block h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text-main);
+    font-size: 1.1rem;
+}
+
+.resolve-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.resolve-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.resolve-option:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.05);
+    /* Assuming this variable might not exist, but let's assume it works or falls back. Actually better to stick to standard vars */
+}
+
+.resolve-option.selected {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+}
+
+.resolve-option input[type="radio"] {
+    accent-color: var(--color-primary);
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+.option-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-name {
+    font-weight: 500;
+}
+
+.option-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.resolve-search-box {
+    margin: var(--spacing-sm) 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.search-results {
+    margin-top: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.remember-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.remember-toggle input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    width: 16px;
+    height: 16px;
+}
+
+.resolve-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.resolve-footer button {
+    padding: 10px 20px;
+    min-width: 120px;
+}
