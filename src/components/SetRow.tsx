@@ -10,6 +10,10 @@ interface SetRowProps {
     isDone: boolean;
     showRpe?: boolean;
     rpe?: string;
+    targetWeight?: number;
+    targetReps?: number;
+    weightSuggestionUI?: 'autofill' | 'placeholder' | 'badge';
+    weightUnit?: string;
     onWeightChange: (val: string) => void;
     onRepsChange: (val: string) => void;
     onRpeChange?: (val: string) => void;
@@ -26,6 +30,10 @@ export default function SetRow({
     isDone,
     showRpe = false,
     rpe = '',
+    targetWeight,
+    targetReps,
+    weightSuggestionUI = 'autofill',
+    weightUnit = 'lbs',
     onWeightChange,
     onRepsChange,
     onRpeChange,
@@ -33,9 +41,20 @@ export default function SetRow({
     onRemove
 }: SetRowProps) {
 
-    // A tiny helper to render set type indicator if needed, 
+    // A tiny helper to render set type indicator if needed,
     // but usually it's just the index for a normal set.
     const setLabel = type === 'warmup' ? 'W' : type === 'failure' ? 'F' : type === 'drop' ? 'D' : index;
+
+    // Only show target hints for working sets that have AI suggestions
+    const hasTarget = type === 'normal' && targetWeight !== undefined && targetReps !== undefined;
+
+    const weightPlaceholder = hasTarget && weightSuggestionUI === 'placeholder'
+        ? `${targetWeight} ${weightUnit}`
+        : weightUnit;
+
+    const repsPlaceholder = hasTarget && weightSuggestionUI === 'placeholder'
+        ? `${targetReps}`
+        : 'reps';
 
     return (
         <div className={`set-row ${isDone ? 'done' : ''}`}>
@@ -45,12 +64,15 @@ export default function SetRow({
             <div className="set-col set-prev">
                 <span className="prev-text">{previousStr}</span>
             </div>
-            <div className="set-col set-input-col">
+            <div className={`set-col set-input-col${hasTarget && weightSuggestionUI === 'badge' ? ' set-input-col-with-badge' : ''}`}>
+                {hasTarget && weightSuggestionUI === 'badge' && (
+                    <span className="target-badge">🎯 {targetWeight} {weightUnit} × {targetReps}</span>
+                )}
                 <input
                     type="number"
                     inputMode="decimal"
                     className="metric-input"
-                    placeholder="kg"
+                    placeholder={weightPlaceholder}
                     value={weight}
                     onChange={(e) => onWeightChange(e.target.value)}
                     disabled={isDone}
@@ -61,7 +83,7 @@ export default function SetRow({
                     type="number"
                     inputMode="numeric"
                     className="metric-input"
-                    placeholder="reps"
+                    placeholder={repsPlaceholder}
                     value={reps}
                     onChange={(e) => onRepsChange(e.target.value)}
                     disabled={isDone}

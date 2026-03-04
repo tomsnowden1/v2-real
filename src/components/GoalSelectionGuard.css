@@ -492,3 +492,117 @@
     color: var(--color-text-muted);
     text-align: center;
 }
+
+/* ── Strength Baseline Step ──────────────────────────────────────────────── */
+
+.baseline-unit-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    align-self: center;
+    margin-top: 20px;
+    margin-bottom: 4px;
+}
+
+.unit-toggle-btn {
+    flex: 1;
+    padding: 10px 28px;
+    border: none;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.unit-toggle-btn.active {
+    background: var(--color-primary);
+    color: white;
+}
+
+.baseline-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.baseline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.baseline-label {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--color-text-main);
+    flex: 1;
+}
+
+.baseline-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.baseline-input {
+    width: 80px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text-main);
+    font-size: var(--font-base);
+    font-weight: 600;
+    text-align: right;
+}
+
+.baseline-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* hide the number input spinners */
+.baseline-input::-webkit-outer-spin-button,
+.baseline-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.baseline-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.baseline-unit-label {
+    font-size: var(--font-sm);
+    color: var(--color-text-muted);
+    min-width: 22px;
+}
+
+.baseline-skip-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    padding: 12px 16px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: border-color 0.2s, color 0.2s;
+    width: 100%;
+}
+
+.baseline-skip-btn:hover {
+    border-color: var(--color-text-main);
+    color: var(--color-text-main);
+}

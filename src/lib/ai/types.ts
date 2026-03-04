@@ -11,6 +11,8 @@ export type AIWorkoutSuggestion = {
         sets: number;
         reps: string;
         weight: string;
+        targetWeight?: number; // numeric suggested weight for working sets (in user's unit)
+        targetReps?: number;   // numeric suggested reps for working sets
         notes?: string;
     }[];
 };
@@ -130,7 +132,8 @@ export interface AIProvider {
         additionalContext?: string,
         personaContext?: string,
         recentHistoryContext?: string,
-        userPreferences?: string
+        userPreferences?: string,
+        weightContext?: string
     ): Promise<AIResponse<string>>;
 
     /**

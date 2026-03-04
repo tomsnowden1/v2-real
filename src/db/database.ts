@@ -25,6 +25,8 @@ export interface SetRecord {
     weight: number;
     reps: number;
     isDone: boolean;
+    targetWeight?: number; // AI-suggested weight for this set (working sets only)
+    targetReps?: number;   // AI-suggested reps for this set (working sets only)
 }
 
 export interface WorkoutExercise {
@@ -73,6 +75,15 @@ export interface GymProfile {
     customEquipment: CustomEquipmentItem[]; // User-defined equipment items
 }
 
+export interface StrengthBaselines {
+    squat?: number;
+    benchPress?: number;
+    deadlift?: number;
+    overheadPress?: number;
+    barbellRow?: number;
+    bicepCurl?: number;
+}
+
 export interface UserProfile {
     id: 'default'; // we only expect one profile right now
     goal: 'Consistency/Newborn' | 'Strength' | 'Hypertrophy' | 'Fat loss/Conditioning';
@@ -83,6 +94,10 @@ export interface UserProfile {
     targetWorkoutDays?: number;
     preferences?: string; // Free-form constraints/injuries
     createdAt?: number; // timestamp of when the profile was first created
+    weightUnit?: 'lbs' | 'kg'; // user's preferred weight unit
+    weightSuggestionUI?: 'autofill' | 'placeholder' | 'badge'; // how AI weight suggestions are shown
+    isBeginnerNoWeights?: boolean; // true if user skipped strength baseline (first-timer)
+    strengthBaselines?: StrengthBaselines; // 8-rep comfortable weights from onboarding
 }
 
 export interface Template {
@@ -280,6 +295,11 @@ class IronDatabase extends Dexie {
         this.version(14).stores({
             prs: 'id, exerciseId, metric, date, workoutId'
         });
+
+        // Version 15: adds optional fields to SetRecord (targetWeight, targetReps)
+        // and UserProfile (weightUnit, weightSuggestionUI, isBeginnerNoWeights, strengthBaselines).
+        // All new fields are optional — no migration needed.
+        this.version(15).stores({});
     }
 }
 

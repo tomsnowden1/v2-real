@@ -9,9 +9,10 @@ import {
     GraduationCap, Dumbbell, Trophy, Building2, Home as HomeIcon, User, CalendarDays, FileText,
     BrainCircuit, BarChart3, Warehouse, CalendarCheck
 } from 'lucide-react';
-import type { UserProfile } from '../db/database';
+import type { UserProfile, StrengthBaselines } from '../db/database';
 import WizardShell from './wizard/WizardShell';
 import OptionCardGrid from './wizard/OptionCardGrid';
+import StrengthBaselineStep from './wizard/StrengthBaselineStep';
 import './GoalSelectionGuard.css';
 
 const GOALS = [
@@ -41,7 +42,7 @@ const PERSONAS = [
 
 const SCHEDULES = [2, 3, 4, 5, 6];
 
-type WizardStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type WizardStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export default function GoalSelectionGuard({ children }: { children: React.ReactNode }) {
     const profile = useLiveQuery(() => getUserProfile().then(p => p || null));
@@ -50,6 +51,9 @@ export default function GoalSelectionGuard({ children }: { children: React.React
     const [step, setStep] = useState<WizardStep>(0);
     const [selectedGoal, setSelectedGoal] = useState<UserProfile['goal'] | null>(null);
     const [selectedExperience, setSelectedExperience] = useState<UserProfile['experienceLevel'] | null>(null);
+    const [selectedWeightUnit, setSelectedWeightUnit] = useState<'lbs' | 'kg'>('lbs');
+    const [selectedBaselines, setSelectedBaselines] = useState<StrengthBaselines>({});
+    const [isBeginnerNoWeights, setIsBeginnerNoWeights] = useState(false);
     const [selectedEquipment, setSelectedEquipment] = useState<'commercial' | 'home' | 'bodyweight' | null>(null);
     const [selectedDays, setSelectedDays] = useState<number | null>(3);
     const [selectedPersona, setSelectedPersona] = useState<UserProfile['coachPersona'] | null>(null);
@@ -77,7 +81,11 @@ export default function GoalSelectionGuard({ children }: { children: React.React
             postWorkoutReview: 'Brief',
             theme: profile?.theme || 'System',
             preferences: selectedPreferences,
-            createdAt: profile?.createdAt || Date.now()
+            createdAt: profile?.createdAt || Date.now(),
+            weightUnit: selectedWeightUnit,
+            strengthBaselines: isBeginnerNoWeights ? undefined : selectedBaselines,
+            isBeginnerNoWeights,
+            weightSuggestionUI: 'autofill',
         });
 
         const allEquip = EQUIPMENT_DB.map(e => e.id);
@@ -191,22 +199,42 @@ export default function GoalSelectionGuard({ children }: { children: React.React
                     </WizardShell>
                 )}
 
-                {/* STEP 5: EQUIPMENT */}
+                {/* STEP 5: STRENGTH BASELINES */}
                 {step === 5 && (
-                    <WizardShell onBack={() => setStep(4)} title="Initial Equipment" subtitle="What equipment do you have access to? You can create more detailed profiles later.">
+                    <StrengthBaselineStep
+                        onBack={() => setStep(4)}
+                        initialUnit={selectedWeightUnit}
+                        initialBaselines={selectedBaselines}
+                        onContinue={({ weightUnit, baselines }) => {
+                            setSelectedWeightUnit(weightUnit);
+                            setSelectedBaselines(baselines);
+                            setIsBeginnerNoWeights(false);
+                            setStep(6);
+                        }}
+                        onSkip={() => {
+                            setIsBeginnerNoWeights(true);
+                            setSelectedBaselines({});
+                            setStep(6);
+                        }}
+                    />
+                )}
+
+                {/* STEP 6: EQUIPMENT */}
+                {step === 6 && (
+                    <WizardShell onBack={() => setStep(5)} title="Initial Equipment" subtitle="What equipment do you have access to? You can create more detailed profiles later.">
                         <OptionCardGrid
                             options={[...EQUIPMENTS]}
                             selected={selectedEquipment}
                             onSelect={(id) => setSelectedEquipment(id as typeof selectedEquipment)}
                             singleCol
                         />
-                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedEquipment} onClick={() => setStep(6)}>Next</button>
+                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedEquipment} onClick={() => setStep(7)}>Next</button>
                     </WizardShell>
                 )}
 
-                {/* STEP 6: SCHEDULE */}
-                {step === 6 && (
-                    <WizardShell onBack={() => setStep(5)} title="Target Schedule" subtitle="How many days per week are you aiming to train?">
+                {/* STEP 7: SCHEDULE */}
+                {step === 7 && (
+                    <WizardShell onBack={() => setStep(6)} title="Target Schedule" subtitle="How many days per week are you aiming to train?">
                         <div className="schedule-picker">
                             <CalendarDays size={48} color="var(--color-primary)" className="icon-opacity-low" />
                             <div className="schedule-buttons">
@@ -222,26 +250,26 @@ export default function GoalSelectionGuard({ children }: { children: React.React
                             </div>
                             <p className="schedule-hint">Most goal-oriented programs require 3-5 days.</p>
                         </div>
-                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedDays} onClick={() => setStep(7)}>Next</button>
+                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedDays} onClick={() => setStep(8)}>Next</button>
                     </WizardShell>
                 )}
 
-                {/* STEP 7: PERSONA */}
-                {step === 7 && (
-                    <WizardShell onBack={() => setStep(6)} title="Choose Coach Style" subtitle="How do you want your AI Coach to speak to you?">
+                {/* STEP 8: PERSONA */}
+                {step === 8 && (
+                    <WizardShell onBack={() => setStep(7)} title="Choose Coach Style" subtitle="How do you want your AI Coach to speak to you?">
                         <OptionCardGrid
                             options={PERSONAS}
                             selected={selectedPersona ?? null}
                             onSelect={(id) => setSelectedPersona(id as UserProfile['coachPersona'])}
                             singleCol
                         />
-                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedPersona} onClick={() => setStep(8)}>Next</button>
+                        <button className="goal-save-btn button-margin-top-large" disabled={!selectedPersona} onClick={() => setStep(9)}>Next</button>
                     </WizardShell>
                 )}
 
-                {/* STEP 8: PREFERENCES */}
-                {step === 8 && (
-                    <WizardShell onBack={() => setStep(7)} title="Injuries & Quirks" subtitle="Are there any exercises you physically cannot do? Bad knees? Only 30 minutes to train?">
+                {/* STEP 9: PREFERENCES */}
+                {step === 9 && (
+                    <WizardShell onBack={() => setStep(8)} title="Injuries & Quirks" subtitle="Are there any exercises you physically cannot do? Bad knees? Only 30 minutes to train?">
                         <div className="preferences-container preferences-container-flex">
                             <FileText size={48} color="var(--color-primary)" className="icon-opacity-low" />
                             <textarea

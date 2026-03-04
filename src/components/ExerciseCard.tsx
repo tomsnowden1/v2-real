@@ -17,6 +17,8 @@ export interface ExerciseSet {
     rpe?: string;
     isDone: boolean;
     previousStr?: string;
+    targetWeight?: number; // AI-suggested weight (working sets only)
+    targetReps?: number;   // AI-suggested reps (working sets only)
 }
 
 interface LoadSuggestion {
@@ -34,6 +36,8 @@ interface ExerciseCardProps {
     initialSets: ExerciseSet[];
     supersetId?: string;
     otherExercises?: { id: string; exerciseId: string; exerciseName: string }[];
+    weightSuggestionUI?: 'autofill' | 'placeholder' | 'badge';
+    weightUnit?: string;
     onOptionsClick?: () => void;
     onSwapClick?: () => void;
     onRemoveClick?: () => void;
@@ -52,6 +56,8 @@ export default function ExerciseCard({
     initialSets,
     supersetId,
     otherExercises = [],
+    weightSuggestionUI = 'autofill',
+    weightUnit = 'lbs',
     onOptionsClick,
     onSwapClick,
     onRemoveClick,
@@ -234,7 +240,7 @@ export default function ExerciseCard({
             <div className="table-header">
                 <div className="th-col th-set">SET</div>
                 <div className="th-col th-prev">LAST</div>
-                <div className="th-col th-metric">KG</div>
+                <div className="th-col th-metric">{weightUnit.toUpperCase()}</div>
                 <div className="th-col th-metric">REPS</div>
                 {showAdvanced && <div className="th-col th-metric rpe-col">RPE</div>}
                 <div className="th-col th-actions"><Check size={14} className="done-icon" /></div>
@@ -252,6 +258,10 @@ export default function ExerciseCard({
                         rpe={set.rpe}
                         isDone={set.isDone}
                         showRpe={showAdvanced}
+                        targetWeight={set.targetWeight}
+                        targetReps={set.targetReps}
+                        weightSuggestionUI={weightSuggestionUI}
+                        weightUnit={weightUnit}
                         onWeightChange={(val) => updateSet(set.id, 'weight', val)}
                         onRepsChange={(val) => updateSet(set.id, 'reps', val)}
                         onRpeChange={(val) => updateSet(set.id, 'rpe', val)}
@@ -321,7 +331,7 @@ export default function ExerciseCard({
                                     <span className="load-prev-label">Last session</span>
                                     <span className="load-prev-value">
                                         {loadSuggestion.prevWeight > 0
-                                            ? `${loadSuggestion.prevWeight} kg × ${loadSuggestion.prevReps} reps`
+                                            ? `${loadSuggestion.prevWeight} ${weightUnit} × ${loadSuggestion.prevReps} reps`
                                             : `${loadSuggestion.prevReps} reps (BW)`}
                                     </span>
                                 </div>
@@ -332,7 +342,7 @@ export default function ExerciseCard({
                                     <span className="load-prev-label">Try today</span>
                                     <span className={`load-prev-value load-prev-value-${loadSuggestion.direction}`}>
                                         {loadSuggestion.suggestedWeight > 0
-                                            ? `${loadSuggestion.suggestedWeight} kg`
+                                            ? `${loadSuggestion.suggestedWeight} ${weightUnit}`
                                             : 'Bodyweight'}
                                     </span>
                                     <span className="load-hint-label">{directionInfo[loadSuggestion.direction].label}</span>

@@ -82,7 +82,9 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
                     type: 'normal' as const,
                     weight: 0,
                     reps: parseInt(aiSuggestion.reps) || 0,
-                    isDone: false
+                    isDone: false,
+                    targetWeight: aiSuggestion.targetWeight,
+                    targetReps: aiSuggestion.targetReps,
                 });
             }
 

@@ -143,3 +143,22 @@
     background-color: #fee2e2;
     color: #ef4444;
 }
+
+/* ── Target Badge (badge display mode) ─────────────────────────────────── */
+
+.set-input-col-with-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 72px;
+}
+
+.target-badge {
+    font-size: 10px;
+    color: var(--color-primary);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}

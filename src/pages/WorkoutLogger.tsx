@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useWorkout } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
 import { useAIProvider } from '../hooks/useAIProvider';
@@ -10,6 +11,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import FinishWorkoutSheet, { type TemplateUpdateMode } from '../components/FinishWorkoutSheet';
 import { saveAsTemplate } from '../db/templateService';
 import { db } from '../db/database';
+import { getUserProfile } from '../db/userProfileService';
 import { findOrCreateExerciseByName } from '../db/exerciseService';
 import { generateId } from '../lib/id';
 import { Plus, Play, Dumbbell, Bookmark } from 'lucide-react';
@@ -30,6 +32,9 @@ export default function WorkoutLogger() {
     } = useWorkout();
     const { config, provider } = useAIProvider();
     const navigate = useNavigate();
+    const userProfile = useLiveQuery(() => getUserProfile().then(p => p || null));
+    const weightSuggestionUI = userProfile?.weightSuggestionUI ?? 'autofill';
+    const weightUnit = userProfile?.weightUnit ?? 'lbs';
 
     // Extracted hooks
     const elapsedStr = useWorkoutTimer(isActive, startTime);
@@ -164,11 +169,20 @@ export default function WorkoutLogger() {
                     </div>
                 ) : (
                     exercises.map((ex, idx) => {
-                        const mappedSets = ex.sets.map(s => ({
-                            ...s,
-                            weight: s.weight.toString(),
-                            reps: s.reps.toString()
-                        }));
+                        const mappedSets = ex.sets.map(s => {
+                            // Autofill: pre-populate weight/reps from AI target if the set is empty
+                            const shouldAutofill = weightSuggestionUI === 'autofill'
+                                && s.type === 'normal'
+                                && s.weight === 0
+                                && s.targetWeight !== undefined;
+                            return {
+                                ...s,
+                                weight: shouldAutofill ? String(s.targetWeight) : s.weight.toString(),
+                                reps: shouldAutofill && s.targetReps !== undefined
+                                    ? String(s.targetReps)
+                                    : s.reps.toString(),
+                            };
+                        });
                         const otherExercises = exercises
                             .filter((_, i) => i !== idx)
                             .map(e => ({ id: e.id, exerciseId: e.exerciseId, exerciseName: e.exerciseName || e.exerciseId }));
@@ -180,6 +194,8 @@ export default function WorkoutLogger() {
                                 exerciseId={ex.exerciseId}
                                 supersetId={ex.supersetId}
                                 otherExercises={otherExercises}
+                                weightSuggestionUI={weightSuggestionUI}
+                                weightUnit={weightUnit}
                                 onTitleClick={() => navigate(`/exercises/${ex.exerciseId}`)}
                                 initialSets={mappedSets}
                                 onSwapClick={() => openReplaceModal(ex.id)}

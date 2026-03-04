@@ -42,8 +42,8 @@ Use the EXACT following structure for every response:
     {
       "name": "Full Body Power",
       "exercises": [
-        { "name": "Barbell Squat", "sets": 3, "reps": "5-8", "weight": "RPE 8" },
-        { "name": "Bench Press", "sets": 3, "reps": "8-10", "weight": "60kg", "notes": "Focus on eccentric" }
+        { "name": "Barbell Squat", "sets": 3, "reps": "5", "weight": "RPE 8", "targetWeight": 100, "targetReps": 5 },
+        { "name": "Bench Press", "sets": 3, "reps": "8", "weight": "60kg", "targetWeight": 60, "targetReps": 8, "notes": "Focus on eccentric" }
       ]
     },
     {
@@ -55,8 +55,11 @@ Use the EXACT following structure for every response:
   ]
 }
 
-If you are suggesting a SINGLE workout, you can also just use "workoutSuggestion" as a single object instead of the array.
-If you are just chatting and not suggesting a specific, actionable workout or program, simply omit these keys. 
+WEIGHT SUGGESTION RULES:
+- Always include "targetWeight" (a number) and "targetReps" (a number) for WORKING SETS ONLY.
+- Do NOT include targetWeight/targetReps for warm-up exercises or cardio/bodyweight movements.
+- Return targetWeight in the user's preferred unit (lbs or kg) — do NOT mix units.
+- If you are just chatting and not suggesting a specific, actionable workout or program, simply omit suggestedWorkouts.
 Make sure your JSON is valid.
 `;
 
@@ -71,7 +74,8 @@ export const openaiProvider: AIProvider = {
         additionalContext?: string,
         personaContext?: string,
         recentHistoryContext?: string,
-        userPreferences?: string
+        userPreferences?: string,
+        weightContext?: string
     ): Promise<AIResponse<string>> {
         try {
             const openai = getOpenAIClient(apiKey);
@@ -92,6 +96,10 @@ export const openaiProvider: AIProvider = {
 
             if (userPreferences) {
                 fullPrompt += `\n\nUSER'S PREFERENCES, CONSTRAINTS, & INJURIES (STRICTLY FOLLOW THIS):\n${userPreferences}`;
+            }
+
+            if (weightContext) {
+                fullPrompt += `\n\nUSER'S WEIGHT CONTEXT (use this for targetWeight suggestions):\n${weightContext}`;
             }
 
             const completion = await openai.chat.completions.create({
@@ -294,6 +302,14 @@ Respond ONLY with a valid JSON object — no markdown, no preamble. Use EXACTLY 
   ]
 }
 
+GOAL ALIGNMENT CHECK (required — include results in issues[] if misaligned):
+The user's goal is "${profile.goal}". Check if their actual completed reps match the ideal rep range for that goal:
+- "Strength" → ideal 3-6 reps/set. If they logged 8+ reps on main compound lifts, flag it as an issue.
+- "Hypertrophy" → ideal 8-12 reps/set. If they logged 3-5 reps (too heavy) or 15+ reps (too light), flag it.
+- "Fat loss/Conditioning" → 12-20 reps is fine, flag only extreme outliers.
+- "Consistency/Newborn" → any rep range is acceptable, do not flag rep ranges.
+If there is a mismatch, include a friendly, specific issue in the issues[] array explaining the misalignment and what to change.
+
 Rules:
 - reviewSummary: 3–6 bullets, scannable, data-specific — no generic statements
 - wins: reference exact exercise names and numbers from TODAY's data
@@ -343,16 +359,45 @@ Rules:
                 `- ${w.name}: ${w.exercises.length} exercises. Score: ${w.score?.overall || 'N/A'}/100`
             ).join('\n');
 
+            const unit = profile.weightUnit ?? 'lbs';
+
+            // Build weight baseline context
+            let weightBaselineStr = '';
+            if (profile.isBeginnerNoWeights) {
+                weightBaselineStr = `The user is a beginner with no baseline data. Default to the empty bar (${unit === 'lbs' ? '45 lbs' : '20 kg'}) or the lightest available option for all barbell exercises.`;
+            } else if (profile.strengthBaselines && Object.keys(profile.strengthBaselines).length > 0) {
+                const b = profile.strengthBaselines;
+                const lines: string[] = [];
+                if (b.squat) lines.push(`Squat: ${b.squat} ${unit} × 8`);
+                if (b.benchPress) lines.push(`Bench Press: ${b.benchPress} ${unit} × 8`);
+                if (b.deadlift) lines.push(`Deadlift: ${b.deadlift} ${unit} × 8`);
+                if (b.overheadPress) lines.push(`Overhead Press: ${b.overheadPress} ${unit} × 8`);
+                if (b.barbellRow) lines.push(`Barbell Row: ${b.barbellRow} ${unit} × 8`);
+                if (b.bicepCurl) lines.push(`Bicep Curl: ${b.bicepCurl} ${unit} × 8`);
+                weightBaselineStr = `User's comfortable 8-rep weights (use these as your baseline, scale for goal-appropriate rep ranges):\n${lines.join('\n')}`;
+            }
+
+            // Goal-specific rep range guidance
+            const goalRepRange = profile.goal === 'Strength'
+                ? '3-6 reps at high load'
+                : profile.goal === 'Hypertrophy'
+                    ? '8-12 reps at moderate-high load'
+                    : profile.goal === 'Fat loss/Conditioning'
+                        ? '12-20 reps at moderate load'
+                        : '8-12 reps (beginner/consistency focus)';
+
             const prompt = `You are the IronAI Coach, an expert strength and conditioning AI.
 The user is checking in to plan their workouts for the new week.
 You need to generate ${answers.daysAvailable} distinct workout templates for them to complete this week.
 
-User Goal: ${profile.goal}
+User Goal: ${profile.goal} (target rep range: ${goalRepRange})
 Experience Level: ${profile.experienceLevel || 'Intermediate'}
 Coach Persona: ${profile.coachPersona || 'Supportive'}
 User Constraints/Injuries: ${profile.preferences || 'None specified.'}
 Available Equipment: ${equipmentContext}
+User's Weight Unit: ${unit} — YOU MUST return all targetWeight values in ${unit}. Do NOT mix units.
 
+${weightBaselineStr ? `STRENGTH BASELINES:\n${weightBaselineStr}\n` : ''}
 USER'S CHECK-IN ANSWERS:
 - Days I can train this week: ${answers.daysAvailable}
 - Body Status / Soreness: "${answers.bodyStatus}"
@@ -366,14 +411,17 @@ CRITICAL INSTRUCTION:
 Because you are configured to use JSON Mode, your ENTIRE response MUST be a valid JSON object.
 Do not wrap it in markdown block quotes. Provide ONLY the JSON.
 
-Use the EXACT following structure, returning an array of exactly ${answers.daysAvailable} workouts in the "suggestedWorkouts" array:
+Use the EXACT following structure, returning an array of exactly ${answers.daysAvailable} workouts in the "suggestedWorkouts" array.
+For each WORKING SET exercise, you MUST include "targetWeight" (a number in ${unit}) and "targetReps" (a number).
+Do NOT include targetWeight/targetReps for warm-ups, cardio, or bodyweight-only movements.
+Use recent workout history as the primary reference for target weights — fall back to baselines if no history exists.
 
 {
   "suggestedWorkouts": [
     {
       "name": "Push Day (Chest, Shoulders, Triceps)",
       "exercises": [
-        { "name": "Dumbbell Bench Press", "sets": 3, "reps": "8-12", "weight": "RPE 8", "notes": "Control the eccentric" }
+        { "name": "Barbell Bench Press", "sets": 3, "reps": "${profile.goal === 'Strength' ? '5' : '10'}", "weight": "${profile.goal === 'Strength' ? '135 lbs' : '95 lbs'}", "targetWeight": ${profile.goal === 'Strength' ? 135 : 95}, "targetReps": ${profile.goal === 'Strength' ? 5 : 10}, "notes": "Control the eccentric" }
       ]
     }
   ]

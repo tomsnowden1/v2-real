@@ -174,9 +174,27 @@ export default function Coach() {
             // Build Persona String
             let personaContext = "";
             let userPreferences = "";
+            let weightContext = "";
             if (profile) {
                 if (profile.coachPersona) personaContext = profile.coachPersona;
                 if (profile.preferences) userPreferences = profile.preferences;
+
+                const unit = profile.weightUnit ?? 'lbs';
+                if (profile.isBeginnerNoWeights) {
+                    weightContext = `User's weight unit: ${unit}. The user is a beginner — default to the empty bar (${unit === 'lbs' ? '45 lbs' : '20 kg'}) or lightest option for barbell exercises.`;
+                } else if (profile.strengthBaselines && Object.keys(profile.strengthBaselines).length > 0) {
+                    const b = profile.strengthBaselines;
+                    const lines: string[] = [`User's weight unit: ${unit}. Comfortable 8-rep baselines:`];
+                    if (b.squat) lines.push(`  Squat: ${b.squat} ${unit} × 8`);
+                    if (b.benchPress) lines.push(`  Bench Press: ${b.benchPress} ${unit} × 8`);
+                    if (b.deadlift) lines.push(`  Deadlift: ${b.deadlift} ${unit} × 8`);
+                    if (b.overheadPress) lines.push(`  Overhead Press: ${b.overheadPress} ${unit} × 8`);
+                    if (b.barbellRow) lines.push(`  Barbell Row: ${b.barbellRow} ${unit} × 8`);
+                    if (b.bicepCurl) lines.push(`  Bicep Curl: ${b.bicepCurl} ${unit} × 8`);
+                    weightContext = lines.join('\n');
+                } else {
+                    weightContext = `User's weight unit: ${unit}.`;
+                }
             }
 
             // Build Recent Workouts String with full exercise + set data
@@ -217,7 +235,8 @@ export default function Coach() {
                 gymContextString,
                 personaContext,
                 recentHistoryContext,
-                userPreferences
+                userPreferences,
+                weightContext
             );
 
             if (response.usage) {

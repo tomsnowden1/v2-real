@@ -19,6 +19,19 @@ export default function More() {
         await saveUserProfile({ ...profile, theme: value });
     };
 
+    const handleWeightUnitChange = async (unit: 'lbs' | 'kg') => {
+        if (!profile) return;
+        await saveUserProfile({ ...profile, weightUnit: unit });
+    };
+
+    const handleSuggestionUIChange = async (mode: UserProfile['weightSuggestionUI']) => {
+        if (!profile) return;
+        await saveUserProfile({ ...profile, weightSuggestionUI: mode });
+    };
+
+    const suggestionUI = profile?.weightSuggestionUI ?? 'autofill';
+    const weightUnit = profile?.weightUnit ?? 'lbs';
+
     return (
         <div className="page-content" style={{ padding: '16px' }}>
             <h1>More</h1>
@@ -103,6 +116,93 @@ export default function More() {
                                 <option value="Brief">Brief</option>
                                 <option value="Extended">Extended</option>
                             </select>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h2 style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Workout Display</h2>
+                    <div className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                        {/* Weight unit */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <h3 style={{ margin: 0, color: 'var(--color-text-main)', fontSize: '15px' }}>Weight Unit</h3>
+                                <p style={{ margin: 0, marginTop: '4px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                    Your preferred unit for logging weights.
+                                </p>
+                            </div>
+                            <div style={{ display: 'flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                                {(['lbs', 'kg'] as const).map(u => (
+                                    <button
+                                        key={u}
+                                        onClick={() => handleWeightUnitChange(u)}
+                                        style={{
+                                            padding: '8px 16px',
+                                            border: 'none',
+                                            background: weightUnit === u ? 'var(--color-primary)' : 'var(--color-bg)',
+                                            color: weightUnit === u ? 'white' : 'var(--color-text-muted)',
+                                            fontWeight: 600,
+                                            fontSize: '14px',
+                                            cursor: 'pointer',
+                                            transition: 'background 0.2s, color 0.2s',
+                                        }}
+                                    >
+                                        {u}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
+                            <h3 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '15px' }}>Suggestion Display</h3>
+                            <p style={{ margin: '0 0 12px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                How AI weight suggestions appear in the workout logger.
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {([
+                                    { value: 'autofill', label: 'Auto-fill', desc: 'Pre-fills the weight & reps input with the suggested values.' },
+                                    { value: 'placeholder', label: 'Ghost Placeholder', desc: 'Shows the suggestion as faint placeholder text — input stays empty.' },
+                                    { value: 'badge', label: 'Target Badge', desc: 'Shows a small "🎯 Target" label; the input is always blank.' },
+                                ] as { value: NonNullable<UserProfile['weightSuggestionUI']>; label: string; desc: string }[]).map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        onClick={() => handleSuggestionUIChange(opt.value)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px',
+                                            padding: '12px 14px',
+                                            borderRadius: '10px',
+                                            border: `2px solid ${suggestionUI === opt.value ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                                            background: suggestionUI === opt.value ? 'color-mix(in srgb, var(--color-primary) 8%, var(--color-surface))' : 'var(--color-surface)',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            transition: 'border-color 0.2s, background 0.2s',
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '18px',
+                                            height: '18px',
+                                            borderRadius: '50%',
+                                            border: `2px solid ${suggestionUI === opt.value ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0,
+                                        }}>
+                                            {suggestionUI === opt.value && (
+                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-primary)' }} />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)' }}>{opt.label}</div>
+                                            <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{opt.desc}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                     </div>
