@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import type { AIProvider, AIWorkoutSuggestion, CheckInAnswers, AIResponse, PostWorkoutReview } from './types';
 import type { WorkoutHistory, UserProfile, Template } from '../../db/database';
+import { db } from '../../db/database';
+import { getBlockWeekContext } from '../../db/weeklyPlanService';
 
 /**
  * Returns an OpenAI client configured for the current mode:
@@ -26,6 +28,89 @@ function getOpenAIClient(apiKey: string): OpenAI {
         });
     }
     return new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+}
+
+/**
+ * Builds the Firm Architect system prompt addition for the Coach.
+ * Returns an empty string if the user hasn't completed the Architect intake
+ * (i.e. profile.motivation is not set). Safe to call on every Coach message.
+ *
+ * Inject the result into sendMessageToCoach via the personaContext parameter.
+ */
+export async function buildArchitectSystemPromptAddition(profile: UserProfile): Promise<string> {
+    if (!profile.motivation) return '';
+
+    const blockCtx = getBlockWeekContext(profile);
+    const unit = profile.weightUnit ?? 'lbs';
+
+    // ── Summarise last 30 days of PRs ─────────────────────────────────────────
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    let prSummary = 'No PR data yet.';
+    try {
+        const recentPRs = await db.prs
+            .where('date').aboveOrEqual(thirtyDaysAgo)
+            .toArray();
+
+        if (recentPRs.length > 0) {
+            // Group by exerciseId; keep the highest 1RM per exercise
+            const byExercise = new Map<string, { value: number; metric: string }>();
+            for (const pr of recentPRs) {
+                const existing = byExercise.get(pr.exerciseId);
+                if (!existing || pr.value > existing.value) {
+                    byExercise.set(pr.exerciseId, { value: pr.value, metric: pr.metric });
+                }
+            }
+            // Resolve names and format compactly
+            const lines: string[] = [];
+            for (const [exerciseId, { value, metric }] of byExercise) {
+                const ex = await db.exercises.get(exerciseId);
+                const name = ex?.name ?? exerciseId;
+                lines.push(`${name}: ${value.toFixed(1)} ${unit} (${metric})`);
+            }
+            if (lines.length > 0) prSummary = lines.join(', ');
+        }
+    } catch { /* non-critical — continue without PR data */ }
+
+    const weekLabel = blockCtx.isIntroWeek
+        ? 'Week 1 — Intro / Adaptation'
+        : blockCtx.isDeloadWeek
+            ? `Week ${blockCtx.currentBlockWeek} — Deload`
+            : blockCtx.isPeakWeek
+                ? `Week ${blockCtx.currentBlockWeek} — Peak`
+                : `Week ${blockCtx.currentBlockWeek} — Building`;
+
+    return `
+══════════════════════════════════════════
+FIRM ARCHITECT MODE — ACTIVE
+══════════════════════════════════════════
+You are acting as a Firm Architect — a structured, science-first strength coach
+who owns the user's schedule. You are warm but unapologetically direct. You do
+not negotiate the program mid-block without a very good reason. You explain the
+"why" behind every suggestion with data.
+
+USER'S MOTIVATION (their "why"):
+"${profile.motivation}"
+
+ACCOUNTABILITY STATEMENT:
+"${profile.accountabilityStatement ?? profile.motivation}"
+
+CURRENT TRAINING BLOCK:
+${weekLabel} (volume multiplier: ${blockCtx.volumeMultiplier}x)
+
+LAST 30 DAYS — TOP PRs:
+${prSummary}
+
+ACCOUNTABILITY RULES YOU MUST FOLLOW:
+1. If the user mentions skipping, reducing frequency, changing goals, quitting,
+   or anything similar, OPEN your reply by directly but warmly challenging them
+   using their motivation above. Example: "You said you wanted this for
+   '${profile.motivation}'. That goal doesn't disappear. Let's talk about what's
+   really going on."
+2. Explain the science and rationale behind every suggestion — users trust data.
+3. Be direct about numbers. Never use vague language like "try more reps."
+4. If they're in a deload week, reassure them: rest is part of the plan.
+══════════════════════════════════════════
+`;
 }
 
 const SYSTEM_PROMPT = `

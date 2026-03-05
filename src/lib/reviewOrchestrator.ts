@@ -104,6 +104,45 @@ export async function runReviewForWorkout(
         // ── 4. Auto-save TTL takeaways ────────────────────────────────────────────
         await saveTTLTakeaways(review.takeawaysTTL ?? [], workoutId);
 
+        // ── 4b. Architect accountability follow-up ────────────────────────────────
+        // Only fires when the user has completed the Architect intake (motivation set).
+        if (profile.motivation) {
+            const fatiguePhrases = ['fatigue', 'overreaching', 'overtraining', 'accumulated'];
+            const fatigueIssues = (review.issues ?? []).filter(issue =>
+                fatiguePhrases.some(kw => issue.probableCause.toLowerCase().includes(kw))
+            );
+
+            const TWENTY_MINS_MS = 20 * 60 * 1000;
+            const skippedSets = workout.exercises.reduce(
+                (total, ex) => total + ex.sets.filter(s => !s.isDone).length, 0
+            );
+            const looksLazy = workout.durationMs < TWENTY_MINS_MS && skippedSets >= 2;
+
+            if (fatigueIssues.length >= 2) {
+                await db.chatMessages.add({
+                    id: `msg-architect-fatigue-${generateId()}`,
+                    role: 'assistant',
+                    content: JSON.stringify({
+                        message: `I'm seeing ${fatigueIssues.length} signs of accumulated fatigue in today's session.\n\nYou committed to training for: *"${profile.motivation}"* — that goal is still there. But your body is sending a clear signal.\n\nShould I dial back next week's volume by ~15% as a recovery measure, or would you prefer to push through? Either way, I'll adapt your program accordingly. Just let me know.`,
+                        suggestedWorkouts: []
+                    }),
+                    timestamp: Date.now() + 1500,
+                    type: 'text',
+                });
+            } else if (looksLazy) {
+                await db.chatMessages.add({
+                    id: `msg-architect-nudge-${generateId()}`,
+                    role: 'assistant',
+                    content: JSON.stringify({
+                        message: `That was a short one. Not every session is our best — I get it.\n\nBut remember why you started: *"${profile.motivation}"*.\n\nNext session, let's make sure you get the full work in. Your plan is ready and waiting.`,
+                        suggestedWorkouts: []
+                    }),
+                    timestamp: Date.now() + 1500,
+                    type: 'text',
+                });
+            }
+        }
+
         // ── 5. Update chatMessage to 'complete' ───────────────────────────────────
         await db.chatMessages.update(messageId, {
             reviewStatus: 'complete',

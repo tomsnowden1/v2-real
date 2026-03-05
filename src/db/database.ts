@@ -27,6 +27,7 @@ export interface SetRecord {
     isDone: boolean;
     targetWeight?: number; // AI-suggested weight for this set (working sets only)
     targetReps?: number;   // AI-suggested reps for this set (working sets only)
+    intensityLabel?: string; // e.g. "RPE 8" — display label shown next to the set
 }
 
 export interface WorkoutExercise {
@@ -98,6 +99,11 @@ export interface UserProfile {
     weightSuggestionUI?: 'autofill' | 'placeholder' | 'badge'; // how AI weight suggestions are shown
     isBeginnerNoWeights?: boolean; // true if user skipped strength baseline (first-timer)
     strengthBaselines?: StrengthBaselines; // 8-rep comfortable weights from onboarding
+    // Accountability Architect fields (set during ArchitectIntakeWizard)
+    motivation?: string;              // why this goal matters to them
+    accountabilityStatement?: string; // the "manifesto" they committed to
+    currentBlockWeek?: number;        // 1-6 cycling block week counter
+    isBeginner?: boolean;             // mirrors isBeginnerNoWeights for architect logic
 }
 
 export interface Template {
@@ -119,6 +125,7 @@ export interface WeeklyPlan {
     dayAssignments: DayAssignment[]; // Array of exactly 7 items. Index 0 = Monday, 6 = Sunday.
     completedWorkouts: string[]; // array of workoutHistory IDs
     hasCheckedIn?: boolean; // True if the user has completed the start-of-week check-in
+    weeklyScore?: number;  // 0-100 adherence score; calculated from missed/recovered days
 }
 
 export interface ChatMessage {
@@ -300,6 +307,12 @@ class IronDatabase extends Dexie {
         // and UserProfile (weightUnit, weightSuggestionUI, isBeginnerNoWeights, strengthBaselines).
         // All new fields are optional — no migration needed.
         this.version(15).stores({});
+
+        // Version 16: Accountability Architect fields.
+        // New optional fields on SetRecord (intensityLabel), UserProfile (motivation,
+        // accountabilityStatement, currentBlockWeek, isBeginner), and WeeklyPlan (weeklyScore).
+        // All new fields are optional — no data migration needed.
+        this.version(16).stores({});
     }
 }
 

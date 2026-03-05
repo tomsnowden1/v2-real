@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { getCurrentWeeklyPlan, getCurrentWeekId } from '../db/weeklyPlanService';
+import { getCurrentWeeklyPlan, getCurrentWeekId, calculateWeeklyScore, applyShiftLogic } from '../db/weeklyPlanService';
 import { db } from '../db/database';
 import { useWorkout } from '../context/WorkoutContext';
 import { generateId } from '../lib/id';
@@ -41,6 +41,18 @@ export default function Home() {
     // Perform the mutation (if plan doesn't exist) outside the LiveQuery scope.
     useEffect(() => {
         getCurrentWeeklyPlan().catch(console.error);
+    }, []);
+
+    // Calculate weekly score + apply shift logic once per browser session.
+    // sessionStorage guard prevents repeated runs on every re-render.
+    useEffect(() => {
+        const weekId = getCurrentWeekId();
+        const sessionKey = `architect-score-${weekId}`;
+        if (!sessionStorage.getItem(sessionKey)) {
+            sessionStorage.setItem(sessionKey, '1');
+            calculateWeeklyScore(weekId).catch(console.error);
+            applyShiftLogic(weekId).catch(console.error);
+        }
     }, []);
 
     useEffect(() => {
@@ -130,6 +142,38 @@ export default function Home() {
                         }}
                     />
                 </section>
+
+                {plan.weeklyScore !== undefined && (
+                    <section style={{
+                        padding: '14px 16px',
+                        backgroundColor: 'var(--color-surface)',
+                        borderRadius: '12px',
+                        border: '1px solid var(--color-border)',
+                        marginBottom: '12px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}>
+                        <div>
+                            <p style={{ margin: 0, fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                Week Score
+                            </p>
+                            <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                Based on your adherence &amp; recovery
+                            </p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <span style={{
+                                fontSize: '26px',
+                                fontWeight: 800,
+                                color: plan.weeklyScore >= 80 ? '#10b981' : plan.weeklyScore >= 60 ? '#f59e0b' : '#ef4444',
+                            }}>
+                                {plan.weeklyScore}
+                            </span>
+                            <span style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>/100</span>
+                        </div>
+                    </section>
+                )}
 
                 <section>
                     <button

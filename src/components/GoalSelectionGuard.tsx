@@ -13,6 +13,7 @@ import type { UserProfile, StrengthBaselines } from '../db/database';
 import WizardShell from './wizard/WizardShell';
 import OptionCardGrid from './wizard/OptionCardGrid';
 import StrengthBaselineStep from './wizard/StrengthBaselineStep';
+import ArchitectIntakeWizard from './wizard/ArchitectIntakeWizard';
 import './GoalSelectionGuard.css';
 
 const GOALS = [
@@ -107,7 +108,20 @@ export default function GoalSelectionGuard({ children }: { children: React.React
     };
 
     if (isChecking) return <div className="goal-guard-loading">Loading profile...</div>;
+
+    // Original wizard complete — check if Architect intake is still needed
     if (profile?.goal && profile?.coachPersona && profile?.experienceLevel && profile?.targetWorkoutDays) {
+        // Second gate: Architect intake (runs once for existing users who haven't set motivation)
+        if (!profile.motivation) {
+            return (
+                <div className="goal-selection-overlay">
+                    <div className="goal-selection-container">
+                        <ArchitectIntakeWizard profile={profile} />
+                    </div>
+                </div>
+            );
+        }
+        // Fully onboarded — show the app
         return <>{children}</>;
     }
 

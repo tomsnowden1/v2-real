@@ -106,6 +106,24 @@ export interface AIResponse<T> {
     };
 }
 
+// ------------------------------------------------------------------
+// Accountability Architect
+// ------------------------------------------------------------------
+
+/**
+ * Pre-built context string injected into the Coach system prompt when the
+ * user has completed the Architect intake. Built by buildArchitectSystemPromptAddition()
+ * in openaiAdapter.ts and passed as the personaContext parameter.
+ */
+export type ArchitectContext = {
+    motivation: string;              // why this goal matters to them
+    accountabilityStatement: string; // the manifesto they committed to
+    currentBlockWeek: number;        // 1-6
+    volumeMultiplier: number;        // e.g. 0.8, 1.0, 1.15
+    last30DaysPRSummary: string;     // pre-formatted: "Squat: 140 kg, Bench: 100 kg"
+    weeklyScore?: number;            // current week's adherence score
+};
+
 /**
  * All AI Providers (OpenAI, Anthropic, Gemini, local LLMs) must implement this interface.
  * The application layer relies strictly on these methods, abstracting away the underlying APIs.

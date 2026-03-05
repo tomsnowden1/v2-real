@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useWorkout } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
@@ -43,6 +43,28 @@ export default function WorkoutLogger() {
         templateName,
         handleFinish,
     } = usePostWorkoutReview({ exercises, sourceTemplateId, config, provider, finishWorkout });
+
+    // Readiness Pulse state
+    const [showReadinessPulse, setShowReadinessPulse] = useState(false);
+    const [readinessDone, setReadinessDone] = useState(false);
+    const [weightScaleFactor, setWeightScaleFactor] = useState(1.0);
+
+    // Show the Readiness Pulse once when a workout becomes active
+    useEffect(() => {
+        if (isActive && !readinessDone) {
+            const timer = setTimeout(() => setShowReadinessPulse(true), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isActive, readinessDone]);
+
+    const handleReadiness = (energy: number) => {
+        let factor = 1.0;
+        if (energy <= 2) factor = 0.90;
+        else if (energy >= 4) factor = 1.075;
+        setWeightScaleFactor(factor);
+        setShowReadinessPulse(false);
+        setReadinessDone(true);
+    };
 
     // Modal states
     const [isReplaceModalOpen, setIsReplaceModalOpen] = useState(false);
@@ -175,9 +197,13 @@ export default function WorkoutLogger() {
                                 && s.type === 'normal'
                                 && s.weight === 0
                                 && s.targetWeight !== undefined;
+                            // Apply readiness scale factor and round to nearest 2.5
+                            const scaledTarget = s.targetWeight !== undefined
+                                ? Math.round((s.targetWeight * weightScaleFactor) / 2.5) * 2.5
+                                : undefined;
                             return {
                                 ...s,
-                                weight: shouldAutofill ? String(s.targetWeight) : s.weight.toString(),
+                                weight: shouldAutofill ? String(scaledTarget ?? s.targetWeight) : s.weight.toString(),
                                 reps: shouldAutofill && s.targetReps !== undefined
                                     ? String(s.targetReps)
                                     : s.reps.toString(),
@@ -252,6 +278,55 @@ export default function WorkoutLogger() {
             </div>
 
             <div className="page-spacer"></div>
+
+            {/* ── Readiness Pulse ──────────────────────────────────────────────── */}
+            {showReadinessPulse && (
+                <div
+                    style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+                    onClick={() => { setShowReadinessPulse(false); setReadinessDone(true); }}
+                >
+                    <div
+                        style={{ backgroundColor: 'var(--color-surface)', borderRadius: '20px 20px 0 0', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--color-text-main)' }}>How are you feeling today?</h3>
+                            <p style={{ margin: '6px 0 0 0', fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                                Your Coach will adjust today's target weights based on your energy.
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                            {[
+                                { level: 1, emoji: '😴', label: 'Exhausted' },
+                                { level: 2, emoji: '😕', label: 'Low' },
+                                { level: 3, emoji: '😐', label: 'Normal' },
+                                { level: 4, emoji: '😊', label: 'Good' },
+                                { level: 5, emoji: '🔥', label: 'Energized' },
+                            ].map(({ level, emoji, label }) => (
+                                <button
+                                    key={level}
+                                    onClick={() => handleReadiness(level)}
+                                    style={{
+                                        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                        gap: '4px', padding: '12px 4px', borderRadius: '12px',
+                                        border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)',
+                                        cursor: 'pointer', transition: 'all 0.15s ease',
+                                    }}
+                                >
+                                    <span style={{ fontSize: '24px' }}>{emoji}</span>
+                                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', textAlign: 'center' }}>{label}</span>
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => { setShowReadinessPulse(false); setReadinessDone(true); }}
+                            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '14px', cursor: 'pointer', padding: '4px' }}
+                        >
+                            Skip — use default weights
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <ReplaceModal
                 isOpen={isReplaceModalOpen}

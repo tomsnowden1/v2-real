@@ -260,6 +260,7 @@ export default function ExerciseCard({
                         showRpe={showAdvanced}
                         targetWeight={set.targetWeight}
                         targetReps={set.targetReps}
+                        intensityLabel={set.intensityLabel}
                         weightSuggestionUI={weightSuggestionUI}
                         weightUnit={weightUnit}
                         onWeightChange={(val) => updateSet(set.id, 'weight', val)}

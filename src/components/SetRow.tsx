@@ -12,6 +12,7 @@ interface SetRowProps {
     rpe?: string;
     targetWeight?: number;
     targetReps?: number;
+    intensityLabel?: string;
     weightSuggestionUI?: 'autofill' | 'placeholder' | 'badge';
     weightUnit?: string;
     onWeightChange: (val: string) => void;
@@ -32,6 +33,7 @@ export default function SetRow({
     rpe = '',
     targetWeight,
     targetReps,
+    intensityLabel,
     weightSuggestionUI = 'autofill',
     weightUnit = 'lbs',
     onWeightChange,
@@ -67,6 +69,11 @@ export default function SetRow({
             <div className={`set-col set-input-col${hasTarget && weightSuggestionUI === 'badge' ? ' set-input-col-with-badge' : ''}`}>
                 {hasTarget && weightSuggestionUI === 'badge' && (
                     <span className="target-badge">🎯 {targetWeight} {weightUnit} × {targetReps}</span>
+                )}
+                {intensityLabel && (
+                    <span style={{ fontSize: '10px', fontWeight: 600, color: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', borderRadius: '4px', padding: '1px 5px', marginBottom: '2px', display: 'inline-block' }}>
+                        {intensityLabel}
+                    </span>
                 )}
                 <input
                     type="number"
