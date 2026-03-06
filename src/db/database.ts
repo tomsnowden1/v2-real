@@ -104,6 +104,14 @@ export interface UserProfile {
     accountabilityStatement?: string; // the "manifesto" they committed to
     currentBlockWeek?: number;        // 1-6 cycling block week counter
     isBeginner?: boolean;             // mirrors isBeginnerNoWeights for architect logic
+    // Enhanced onboarding fields (v17)
+    sessionDuration?: '30min' | '45min' | '60min' | '90min+';
+    currentActivityLevel?: 'Sedentary' | 'Lightly Active' | 'Moderately Active' | 'Very Active';
+    exercisePreferences?: string;     // e.g. "Compound lifts, no machines"
+    consistencyBlockers?: string[];   // e.g. ["Early mornings", "Lack of time"]
+    sleepHours?: '<6' | '6-7' | '7-8' | '8+';
+    stressLevel?: 'Low' | 'Moderate' | 'High';
+    onboardingComplete?: boolean;     // true once onboarding orchestrator has run
 }
 
 export interface Template {
@@ -313,6 +321,12 @@ class IronDatabase extends Dexie {
         // accountabilityStatement, currentBlockWeek, isBeginner), and WeeklyPlan (weeklyScore).
         // All new fields are optional — no data migration needed.
         this.version(16).stores({});
+
+        // Version 17: Enhanced onboarding fields on UserProfile.
+        // New optional fields: sessionDuration, currentActivityLevel, exercisePreferences,
+        // consistencyBlockers, sleepHours, stressLevel, onboardingComplete.
+        // All optional — no data migration needed.
+        this.version(17).stores({});
     }
 }
 
