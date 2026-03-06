@@ -19,6 +19,7 @@ export interface ExerciseSet {
     previousStr?: string;
     targetWeight?: number; // AI-suggested weight (working sets only)
     targetReps?: number;   // AI-suggested reps (working sets only)
+    intensityLabel?: string; // e.g. "RPE 8" — display label
 }
 
 interface LoadSuggestion {

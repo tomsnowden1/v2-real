@@ -1,11 +1,35 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getUserProfile, saveUserProfile } from '../db/userProfileService';
+import { db } from '../db/database';
 import type { UserProfile } from '../db/database';
 import { Trophy } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function More() {
     const profile = useLiveQuery(() => getUserProfile().then(p => p || null));
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+    const handleReset = async () => {
+        // Clear all user data from the database (keep exercises — those are the built-in library)
+        await Promise.all([
+            db.workoutHistory.clear(),
+            db.prs.clear(),
+            db.gymProfiles.clear(),
+            db.userProfiles.clear(),
+            db.weeklyPlans.clear(),
+            db.templates.clear(),
+            db.chatMessages.clear(),
+            db.restTimerPrefs.clear(),
+            db.takeaways.clear(),
+        ]);
+        // Clear session/ephemeral localStorage keys
+        localStorage.removeItem('ironai_active_workout');
+        localStorage.removeItem('ironai_install_banner_dismissed');
+        // Hard reload — the app will show the onboarding wizard with no profile
+        window.location.href = '/';
+    };
 
     const handleReviewPreferenceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (!profile) return;
@@ -33,6 +57,7 @@ export default function More() {
     const weightUnit = profile?.weightUnit ?? 'lbs';
 
     return (
+        <>
         <div className="page-content" style={{ padding: '16px' }}>
             <h1>More</h1>
             <p style={{ color: 'var(--color-text-muted)', marginBottom: '16px' }}>Library tools, gyms, and preferences.</p>
@@ -242,7 +267,44 @@ export default function More() {
                     </div>
                 </section>
 
+                <section>
+                    <h2 style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Danger Zone</h2>
+                    <div className="card" style={{ padding: '16px' }}>
+                        <h3 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '15px' }}>Reset & Start Over</h3>
+                        <p style={{ margin: '0 0 14px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                            Clears all your workouts, history, coach chat, templates, and profile. Walks you through setup from the beginning. Your AI keys are kept.
+                        </p>
+                        <button
+                            onClick={() => setShowResetConfirm(true)}
+                            style={{
+                                padding: '10px 18px',
+                                borderRadius: '8px',
+                                border: '1.5px solid #ef4444',
+                                background: 'transparent',
+                                color: '#ef4444',
+                                fontWeight: 600,
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Reset App
+                        </button>
+                    </div>
+                </section>
+
             </div>
         </div>
+
+        <ConfirmModal
+            isOpen={showResetConfirm}
+            title="Reset everything?"
+            message="This will permanently delete all your workouts, history, coach chat, templates, and profile. You'll go through setup again. This cannot be undone."
+            confirmText="Yes, reset everything"
+            cancelText="Cancel"
+            isDestructive
+            onConfirm={handleReset}
+            onCancel={() => setShowResetConfirm(false)}
+        />
+        </>
     );
 }
