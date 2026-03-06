@@ -151,7 +151,8 @@ export interface AIProvider {
         personaContext?: string,
         recentHistoryContext?: string,
         userPreferences?: string,
-        weightContext?: string
+        weightContext?: string,
+        exerciseCatalogContext?: string   // TODO v2: refactor to a single CoachContext object
     ): Promise<AIResponse<string>>;
 
     /**

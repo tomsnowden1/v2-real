@@ -11,7 +11,8 @@ export const anthropicProvider: AIProvider = {
         _c1?: string,
         _c2?: string,
         _c3?: string,
-        _c4?: string
+        _c4?: string,
+        _c5?: string
     ): Promise<AIResponse<string>> {
         // TODO: Implement Anthropic API call
         console.warn('Anthropic provider not yet fully implemented.');
@@ -40,7 +41,8 @@ export const geminiProvider: AIProvider = {
         _c1?: string,
         _c2?: string,
         _c3?: string,
-        _c4?: string
+        _c4?: string,
+        _c5?: string
     ): Promise<AIResponse<string>> {
         // TODO: Implement Gemini API call
         console.warn('Gemini provider not yet fully implemented.');

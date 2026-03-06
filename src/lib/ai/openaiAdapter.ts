@@ -160,7 +160,8 @@ export const openaiProvider: AIProvider = {
         personaContext?: string,
         recentHistoryContext?: string,
         userPreferences?: string,
-        weightContext?: string
+        weightContext?: string,
+        exerciseCatalogContext?: string
     ): Promise<AIResponse<string>> {
         try {
             const openai = getOpenAIClient(apiKey);
@@ -185,6 +186,10 @@ export const openaiProvider: AIProvider = {
 
             if (weightContext) {
                 fullPrompt += `\n\nUSER'S WEIGHT CONTEXT (use this for targetWeight suggestions):\n${weightContext}`;
+            }
+
+            if (exerciseCatalogContext) {
+                fullPrompt += `\n\n${exerciseCatalogContext}\nIMPORTANT: Always use the EXACT exercise names from the list above. Do not invent new exercise names.`;
             }
 
             const completion = await openai.chat.completions.create({

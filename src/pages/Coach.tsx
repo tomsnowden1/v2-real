@@ -13,7 +13,7 @@ import { db } from '../db/database';
 import type { ChatMessage, UserProfile, Exercise } from '../db/database';
 import { getUserProfile } from '../db/userProfileService';
 import { saveAsTemplate } from '../db/templateService';
-import { addAliasToExercise } from '../db/exerciseService';
+import { addAliasToExercise, buildExerciseCatalogContext } from '../db/exerciseService';
 import ResolveExercisesModal, { type ResolvedChoice } from '../components/ResolveExercisesModal';
 import { resolveExerciseName, type ResolutionResult } from '../lib/exerciseResolver';
 import { runReviewForWorkout } from '../lib/reviewOrchestrator';
@@ -32,6 +32,7 @@ export default function Coach() {
     // Removed activeWorkoutId check because activeWorkouts table doesn't exist in V1 Schema
     const workouts = useLiveQuery(() => db.workoutHistory.orderBy('startTime').reverse().toArray());
     const gyms = useLiveQuery(() => db.gymProfiles.toArray());
+    const allExercises = useLiveQuery(() => db.exercises.toArray(), []);
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
     // Load chat history from Dexie (live — updates automatically when other tabs or hooks write to it)
@@ -228,6 +229,8 @@ export default function Coach() {
                 .slice(-10)
                 .map(m => ({ role: m.role, content: m.content }));
 
+            const catalogContext = allExercises ? buildExerciseCatalogContext(allExercises) : '';
+
             const response = await provider.sendMessageToCoach(
                 config.apiKey ?? '',
                 config.selectedModel,
@@ -236,7 +239,8 @@ export default function Coach() {
                 personaContext,
                 recentHistoryContext,
                 userPreferences,
-                weightContext
+                weightContext,
+                catalogContext
             );
 
             if (response.usage) {

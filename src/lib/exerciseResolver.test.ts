@@ -125,3 +125,117 @@ describe('resolveExerciseName — rawName passthrough', () => {
         expect(result.rawName).toBe(input);
     });
 });
+
+// ─── New: confidence tier ─────────────────────────────────────────────────────
+
+describe('resolveExerciseName — confidence field', () => {
+    it('all exact/alias/parenthetical matches have confidence: high', () => {
+        const exact = resolveExerciseName('Dumbbell Bench Press', mockExercises);
+        expect(exact.confidence).toBe('high');
+
+        const alias = resolveExerciseName('pullups', mockExercises);
+        expect(alias.confidence).toBe('high');
+
+        const paren = resolveExerciseName('Deadlift', mockExercises);
+        expect(paren.confidence).toBe('high');
+    });
+
+    it('Romanian Deadlift auto-resolves with high confidence (unique clear winner)', () => {
+        const result = resolveExerciseName('Romanian Deadlift', mockExercises);
+        expect(result.status).toBe('resolved');
+        expect(result.confidence).toBe('high');
+        expect(result.exerciseId).toBe('7');
+    });
+
+    it('does NOT auto-resolve Bench Press — two candidates score similarly', () => {
+        const result = resolveExerciseName('Bench Press', mockExercises);
+        expect(result.status).toBe('needs_user');
+        // Confidence may be medium since candidates are plausible
+        expect(['medium', 'low']).toContain(result.confidence);
+    });
+});
+
+// ─── New: alias fuzzy scoring ─────────────────────────────────────────────────
+
+describe('resolveExerciseName — alias fuzzy scoring', () => {
+    it('resolves or surfaces a near-alias phrase via alias scoring', () => {
+        const exercises: Exercise[] = [{
+            id: 'lat1',
+            name: 'Lat Pulldown (Cable)',
+            aliases: ['lat pulldown', 'lat pull'],
+            category: 'Cable',
+            bodyPart: 'Back',
+            isCustom: false,
+            userNotes: ''
+        }];
+        const result = resolveExerciseName('Lat Pulldowns', exercises);
+        // Should either auto-resolve or surface lat1 as top candidate
+        const resolvedOrTop = result.exerciseId === 'lat1' || result.candidates?.[0]?.id === 'lat1';
+        expect(resolvedOrTop).toBe(true);
+    });
+
+    it('scores aliases so a phrase matching an alias wins over unrelated exercises', () => {
+        const exercises: Exercise[] = [
+            {
+                id: 'bc1',
+                name: 'Bicep Curl (Dumbbell)',
+                aliases: ['bicep curl', 'dumbbell curl'],
+                category: 'Dumbbell',
+                bodyPart: 'Arms',
+                isCustom: false,
+                userNotes: ''
+            },
+            {
+                id: 'unrelated',
+                name: 'Leg Press (Machine)',
+                aliases: [],
+                category: 'Machine',
+                bodyPart: 'Legs',
+                isCustom: false,
+                userNotes: ''
+            }
+        ];
+        const result = resolveExerciseName('Bicep Curl', exercises);
+        // bc1 should either be resolved or top candidate
+        const bc1IsTop = result.exerciseId === 'bc1' || result.candidates?.[0]?.id === 'bc1';
+        expect(bc1IsTop).toBe(true);
+    });
+});
+
+// ─── New: remembered alias reuse ──────────────────────────────────────────────
+
+describe('resolveExerciseName — remembered alias reuse', () => {
+    it('resolves after user confirmed alias was added', () => {
+        // Simulates: user confirmed "Bicep Curl" → "Bicep Curl (Dumbbell)" and checked "Remember"
+        // addAliasToExercise added "Bicep Curl" to the exercise aliases
+        const exercises: Exercise[] = [{
+            id: 'bc1',
+            name: 'Bicep Curl (Dumbbell)',
+            aliases: ['Bicep Curl'], // persisted from prior confirmation
+            category: 'Dumbbell',
+            bodyPart: 'Arms',
+            isCustom: false,
+            userNotes: ''
+        }];
+        const result = resolveExerciseName('Bicep Curl', exercises);
+        expect(result.status).toBe('resolved');
+        expect(result.exerciseId).toBe('bc1');
+        expect(result.confidence).toBe('high');
+    });
+
+    it('normalize ensures alias "Bicep Curl" matches query "bicep curl"', () => {
+        const exercises: Exercise[] = [{
+            id: 'bc1',
+            name: 'Bicep Curl (Dumbbell)',
+            aliases: ['Bicep Curl'],
+            category: 'Dumbbell',
+            bodyPart: 'Arms',
+            isCustom: false,
+            userNotes: ''
+        }];
+        // lowercase variation — normalize strips case so this still resolves
+        const result = resolveExerciseName('bicep curl', exercises);
+        expect(result.status).toBe('resolved');
+        expect(result.exerciseId).toBe('bc1');
+    });
+});

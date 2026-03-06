@@ -18,7 +18,15 @@ interface Props {
 }
 
 export default function ResolveExercisesModal({ unresolvedItems, allExercises, onComplete, onCancel }: Props) {
-    const [choices, setChoices] = useState<Record<string, { id: string, remember: boolean }>>({});
+    // Pre-select best candidate for medium-confidence items
+    const initialChoices: Record<string, { id: string, remember: boolean }> = {};
+    for (const item of unresolvedItems) {
+        if (item.confidence === 'medium' && item.candidates && item.candidates.length > 0) {
+            initialChoices[item.rawName] = { id: item.candidates[0].id, remember: true };
+        }
+    }
+
+    const [choices, setChoices] = useState<Record<string, { id: string, remember: boolean }>>(initialChoices);
     const [searchQueries, setSearchQueries] = useState<Record<string, string>>({});
 
     const handleSelect = (rawName: string, id: string) => {
@@ -61,19 +69,23 @@ export default function ResolveExercisesModal({ unresolvedItems, allExercises, o
                 <header className="resolve-header">
                     <div className="resolve-title">
                         <AlertCircle size={20} className="icon-warning" />
-                        <h2>Resolve {unresolvedItems.length} {unresolvedItems.length === 1 ? 'Exercise' : 'Exercises'}</h2>
+                        <h2>Match {unresolvedItems.length} {unresolvedItems.length === 1 ? 'Exercise' : 'Exercises'}</h2>
                     </div>
                     <button className="icon-btn" onClick={onCancel}><X size={20} /></button>
                 </header>
                 <div className="resolve-body">
                     <p className="resolve-desc">
-                        Coach suggested some exercises that don't cleanly match your library. Please select the correct match below to prevent duplicates.
+                        These exercises from Coach didn't match exactly. Pick the closest match below.
                     </p>
 
                     {unresolvedItems.map(item => {
                         const query = searchQueries[item.rawName] || '';
+                        // Search includes aliases
                         const searchResults = query.length > 1
-                            ? allExercises.filter(ex => ex.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5)
+                            ? allExercises.filter(ex =>
+                                ex.name.toLowerCase().includes(query.toLowerCase()) ||
+                                (ex.aliases || []).some(a => a.toLowerCase().includes(query.toLowerCase()))
+                            ).slice(0, 5)
                             : [];
 
                         const currentChoiceId = choices[item.rawName]?.id;
@@ -82,6 +94,13 @@ export default function ResolveExercisesModal({ unresolvedItems, allExercises, o
                         return (
                             <div key={item.rawName} className="resolve-block">
                                 <h3>"{item.rawName}"</h3>
+
+                                {item.confidence === 'medium' && (
+                                    <span className="confidence-badge medium">Best guess pre-selected</span>
+                                )}
+                                {item.confidence === 'low' && (
+                                    <span className="confidence-badge low">No close match found — search below</span>
+                                )}
 
                                 <div className="resolve-options">
                                     {(item.candidates || []).map(cand => (
