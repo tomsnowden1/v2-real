@@ -12,7 +12,10 @@
       "Bash(xargs cat)",
       "Bash(git -C /Users/jess/v2-real log --oneline -20)",
       "Bash(grep -E \"recharts|axios|fetch|http\" /Users/jess/v2-real/src/**/*.ts)",
-      "Bash(wc -l /Users/jess/v2-real/src/**/*.tsx /Users/jess/v2-real/src/**/*.ts)"
+      "Bash(wc -l /Users/jess/v2-real/src/**/*.tsx /Users/jess/v2-real/src/**/*.ts)",
+      "Bash(npm run test:run)",
+      "Bash(git add -A)",
+      "Bash(git commit:*)"
     ]
   }
 }

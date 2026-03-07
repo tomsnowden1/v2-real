@@ -140,11 +140,12 @@
 - **Completed:** 2026-03-07
 
 ### QW2. Add Progress Dots to Onboarding Wizard
-- [ ] Calculate total steps in `ArchitectIntakeWizard.tsx` (accounting for beginner/recovery skip logic)
-- [ ] Pass `dots` array to each `<WizardShell>` call — the prop already exists and renders correctly
-- [ ] Users see "Step 4 of 8" style progress, reducing drop-off
+- [x] Calculate total steps in `ArchitectIntakeWizard.tsx` (accounting for beginner/recovery skip logic)
+- [x] Pass `dots` array to each `<WizardShell>` call — the prop already exists and renders correctly
+- [x] Users see "Step 4 of 8" style progress, reducing drop-off
 - **Files:** `src/components/wizard/ArchitectIntakeWizard.tsx` (WizardShell.tsx already supports it)
 - **Effort:** 1-2 hours
+- **Completed:** 2026-03-07
 
 ### QW3. Fix Dead "+ Custom" Button in Exercise Library
 - [ ] Wire up `onClick` handler on `ExerciseLibrary.tsx` line ~52
@@ -415,3 +416,12 @@
   - Prevents double-taps and provides visual feedback during the save operation
   - Build verified: no TypeScript errors
   - All 91 tests pass (including 70 from previous work)
+
+- **QW2 Complete**: Add Progress Dots to Onboarding Wizard
+  - Created `getTotalVisibleSteps()` helper to calculate visible steps accounting for beginner/goal skip logic
+  - Created `generateDots()` helper to build boolean array where current step is marked true
+  - Passed `dots` prop to all 9 WizardShell components (steps 1-9)
+  - Non-beginner + Strength/Hypertrophy goals show 10 steps; Beginner + Consistency show 8 steps
+  - Users now see progress indicator updating as they advance through wizard
+  - Build verified: no TypeScript errors
+  - All 91 tests pass

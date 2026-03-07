@@ -14,6 +14,12 @@ export default function ExerciseLibrary() {
     const [activeBodyPart, setActiveBodyPart] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [showCustomOnly, setShowCustomOnly] = useState(false);
+    const [toastMsg, setToastMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+    const showToast = (text: string, type: 'success' | 'error') => {
+        setToastMsg({ text, type });
+        setTimeout(() => setToastMsg(null), 3000);
+    };
 
     // Load all exercises reactively — client-side filtering handles search + filters
     const allExercises = useLiveQuery(() => db.exercises.toArray(), []);
@@ -49,7 +55,7 @@ export default function ExerciseLibrary() {
                     <span>Back</span>
                 </button>
                 <h1>Exercises</h1>
-                <button className="create-custom-btn">
+                <button className="create-custom-btn" onClick={() => showToast("Custom exercises coming soon!", "error")}>
                     + Custom
                 </button>
             </header>
@@ -128,6 +134,12 @@ export default function ExerciseLibrary() {
                     )}
                 </div>
             </div>
+
+            {toastMsg && (
+                <div className={`exercise-library-toast ${toastMsg.type}`}>
+                    {toastMsg.text}
+                </div>
+            )}
         </div>
     );
 }
