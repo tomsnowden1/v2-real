@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2 } from 'lucide-react';
+import { useWorkout } from '../context/WorkoutContext';
+import { generateId } from '../lib/id';
+import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2, Play } from 'lucide-react';
 import ScoreRing from '../components/ScoreRing';
 import './WorkoutDetail.css';
 
 export default function WorkoutDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { startWorkout, updateExercises, isActive } = useWorkout();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const workout = useLiveQuery(
@@ -66,6 +69,25 @@ export default function WorkoutDetail() {
             case 'failure': return 'Failure';
             default: return 'Working';
         }
+    };
+
+    // ── repeat handler ──────────────────────────────────────────────
+    const handleRepeat = () => {
+        if (!workout) return;
+
+        if (isActive) {
+            const confirmReplace = window.confirm("You have an active workout. Replace it?");
+            if (!confirmReplace) return;
+        }
+
+        startWorkout(workout.name);
+        const freshExercises = workout.exercises.map(ex => ({
+            ...ex,
+            id: `we-${generateId()}`,
+            sets: ex.sets.map(s => ({ ...s, isDone: false, weight: 0 }))
+        }));
+        updateExercises(freshExercises);
+        navigate('/workout');
     };
 
     // ── delete handler ──────────────────────────────────────────────
@@ -186,7 +208,11 @@ export default function WorkoutDetail() {
                     </div>
                 ))}
 
-                {/* ── Delete Button ──────────────────────────────────── */}
+                {/* ── Action Buttons ──────────────────────────────────── */}
+                <button className="wd-repeat-btn" onClick={handleRepeat}>
+                    <Play size={18} />
+                    Repeat This Workout
+                </button>
                 <button className="wd-delete-btn" onClick={() => setShowDeleteModal(true)}>
                     <Trash2 size={18} />
                     Delete Workout

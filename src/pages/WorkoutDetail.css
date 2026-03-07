@@ -289,6 +289,30 @@
     color: #ef4444;
 }
 
+/* ── Repeat Button ───────────────────────────────────────────────── */
+.wd-repeat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: var(--spacing-md);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: rgba(30, 189, 123, 0.08);
+    color: var(--color-primary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wd-repeat-btn:hover {
+    background: rgba(30, 189, 123, 0.15);
+    border-color: var(--color-primary);
+}
+
 /* ── Delete Button ───────────────────────────────────────────────── */
 .wd-delete-btn {
     display: flex;
