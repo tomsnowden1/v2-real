@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { RefreshCw, Trophy, TrendingUp, AlertTriangle, Target, CheckCircle2, Clock } from 'lucide-react';
 import type { ChatMessage, Takeaway } from '../db/database';
 import type { PostWorkoutReview, TakeawayDurable } from '../lib/ai/types';
+import { validatePostWorkoutReview } from '../lib/ai/types';
 import { db } from '../db/database';
 import { generateId } from '../lib/id';
 import './ReviewCard.css';
@@ -66,9 +67,47 @@ export default function ReviewCard({ message, onRetry }: ReviewCardProps) {
 
     let review: PostWorkoutReview;
     try {
-        review = JSON.parse(message.reviewData) as PostWorkoutReview;
+        const parsed: unknown = JSON.parse(message.reviewData);
+        if (!validatePostWorkoutReview(parsed)) {
+            return (
+                <div className="review-card review-card--error">
+                    <AlertTriangle size={24} className="review-card__error-icon" />
+                    <p className="review-card__error-title">Review incomplete</p>
+                    <p className="review-card__error-sub">
+                        The AI returned an unexpected response. Retry to get a fresh review.
+                    </p>
+                    {onRetry && message.reviewWorkoutId && (
+                        <button
+                            className="review-card__retry-btn"
+                            onClick={() => onRetry(message.reviewWorkoutId!, message.id)}
+                        >
+                            <RefreshCw size={14} />
+                            Retry
+                        </button>
+                    )}
+                </div>
+            );
+        }
+        review = parsed;
     } catch {
-        return null;
+        return (
+            <div className="review-card review-card--error">
+                <AlertTriangle size={24} className="review-card__error-icon" />
+                <p className="review-card__error-title">Review could not be loaded</p>
+                <p className="review-card__error-sub">
+                    There was a problem reading the review data. Retry to get a fresh review.
+                </p>
+                {onRetry && message.reviewWorkoutId && (
+                    <button
+                        className="review-card__retry-btn"
+                        onClick={() => onRetry(message.reviewWorkoutId!, message.id)}
+                    >
+                        <RefreshCw size={14} />
+                        Retry
+                    </button>
+                )}
+            </div>
+        );
     }
 
     const handleSaveTakeaway = async (t: TakeawayDurable, idx: number) => {

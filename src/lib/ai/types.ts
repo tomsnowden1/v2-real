@@ -72,6 +72,30 @@ export type PostWorkoutReview = {
     suggestedNextWorkoutEdits?: Array<{ kind: string; description: string; payload: unknown }>;
 };
 
+/**
+ * Runtime type guard for PostWorkoutReview.
+ * TypeScript's `as` only works at compile-time — this checks the actual shape at runtime
+ * so we can show a proper error card instead of going blank if the AI returns bad data.
+ */
+export function validatePostWorkoutReview(data: unknown): data is PostWorkoutReview {
+    if (!data || typeof data !== 'object') return false;
+    const r = data as Record<string, unknown>;
+    const wp = r.weekProgress as Record<string, unknown> | undefined;
+    return (
+        Array.isArray(r.reviewSummary) &&
+        Array.isArray(r.wins) &&
+        Array.isArray(r.issues) &&
+        Array.isArray(r.prHighlights) &&
+        typeof r.weekProgress === 'object' && r.weekProgress !== null &&
+        typeof wp?.completed === 'number' &&
+        typeof wp?.planned === 'number' &&
+        typeof wp?.score === 'number' &&
+        Array.isArray(r.goalProgress) &&
+        Array.isArray(r.takeawaysTTL) &&
+        Array.isArray(r.takeawaysDurableCandidates)
+    );
+}
+
 /** @deprecated Use PostWorkoutReview for new code. Kept for PostWorkoutReviewModal compat. */
 export type AIPostWorkoutReview = {
     score: string;
