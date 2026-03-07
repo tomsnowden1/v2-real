@@ -12,6 +12,7 @@ interface FinishWorkoutSheetProps {
     templateName?: string;
     hasApiKey: boolean;
     hasChangesFromTemplate: boolean;
+    isFinishing: boolean;
     onFinish: (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => void;
     onCancel: () => void;
 }
@@ -24,6 +25,7 @@ export default function FinishWorkoutSheet({
     templateName,
     hasApiKey,
     hasChangesFromTemplate,
+    isFinishing,
     onFinish,
     onCancel
 }: FinishWorkoutSheetProps) {
@@ -131,12 +133,14 @@ export default function FinishWorkoutSheet({
                 <div className="finish-sheet-actions">
                     <button
                         className="finish-sheet-btn primary"
+                        disabled={isFinishing}
                         onClick={() => onFinish(templateUpdateMode, sendToCoach && hasApiKey)}
                     >
-                        Finish & Save
+                        {isFinishing ? 'Saving...' : 'Finish & Save'}
                     </button>
                     <button
                         className="finish-sheet-btn secondary"
+                        disabled={isFinishing}
                         onClick={onCancel}
                     >
                         Cancel

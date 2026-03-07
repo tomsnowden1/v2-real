@@ -1,7 +1,7 @@
 # IronAI — Improvement Plan
 
 > Living document. Add ideas freely. Claude reads this at session start to pick up where we left off.
-> Last updated: 2026-03-03
+> Last updated: 2026-03-07
 
 ---
 
@@ -124,6 +124,151 @@
 - [ ] Add "Analytics" nav link to bottom nav or More page
 - [ ] Use recharts for all charts (already lazy-loaded)
 - [ ] Build verified, preview analytics dashboard
+
+---
+
+## Audit: Quick Wins (< 1 day each)
+
+> Found during full audit on 2026-03-07. Do these first — high impact, low effort.
+
+### QW1. Add Loading State to "Finish & Save" Button
+- [ ] Add `isFinishing` state to `WorkoutLogger.tsx`
+- [ ] Disable the "Finish & Save" button and show "Saving..." text while async `handleFinish` runs
+- [ ] Prevents double-taps and "did it save?" anxiety
+- **Files:** `FinishWorkoutSheet.tsx`, `WorkoutLogger.tsx`
+- **Effort:** 1-2 hours
+
+### QW2. Add Progress Dots to Onboarding Wizard
+- [ ] Calculate total steps in `ArchitectIntakeWizard.tsx` (accounting for beginner/recovery skip logic)
+- [ ] Pass `dots` array to each `<WizardShell>` call — the prop already exists and renders correctly
+- [ ] Users see "Step 4 of 8" style progress, reducing drop-off
+- **Files:** `src/components/wizard/ArchitectIntakeWizard.tsx` (WizardShell.tsx already supports it)
+- **Effort:** 1-2 hours
+
+### QW3. Fix Dead "+ Custom" Button in Exercise Library
+- [ ] Wire up `onClick` handler on `ExerciseLibrary.tsx` line ~52
+- [ ] Add a small form modal (name, body part, category) or at minimum a "Coming soon" toast
+- [ ] The `isCustom` flag already exists on the Exercise interface in `database.ts`
+- **Files:** `src/pages/ExerciseLibrary.tsx`, `src/db/exerciseService.ts`
+- **Effort:** 1-3 hours (basic form) or 15 min (coming soon toast)
+
+### QW4. Unify Modal Overlay Into One CSS Variable
+- [ ] Add `--color-overlay: rgba(0,0,0,0.6)` to `src/index.css`
+- [ ] Replace hardcoded overlays in: FinishWorkoutSheet.css (0.6), ReplaceModal.css (0.5), WorkoutDetail.css (0.5), GymEquipment.css (0.55), AdjustWeekModal.css (0.6), WeeklyCheckInModal.css (0.6), ResolveExercisesModal.css (0.6)
+- [ ] Replace inline style overlays in: `WorkoutLogger.tsx` (0.55), `Home.tsx` (0.6)
+- **Files:** `index.css` + 7 CSS files + 2 TSX files
+- **Effort:** 1-2 hours
+
+### QW5. Add `role="dialog"` + Escape Key to ConfirmModal
+- [ ] Add `role="dialog"` and `aria-modal="true"` to ConfirmModal wrapper
+- [ ] Add `onKeyDown` handler for Escape key
+- [ ] Since ConfirmModal is reused everywhere, this one fix helps all modals
+- **Files:** `src/components/ConfirmModal.tsx`
+- **Effort:** 2-3 hours
+
+---
+
+## Audit: Trust & Safety
+
+> These protect users from data loss and protect your wallet from API abuse.
+
+### TS1. Wrap `finishWorkout` in a Dexie Transaction
+- [ ] Wrap the three sequential DB writes (workoutHistory, weeklyPlan, PRs) in `db.transaction()`
+- [ ] Add user-visible error toast/modal if saving fails (currently errors only go to console)
+- [ ] Move the PR check from fire-and-forget into the transaction scope
+- [ ] Add try/catch with meaningful user message on failure
+- **Why:** This is the most critical data path. A partial failure means workout saves but PRs or weekly plan are wrong — and the user has no way to know.
+- **Files:** `src/context/WorkoutContext.tsx` (lines ~108-143), `weeklyPlanService.ts`, `prService.ts`
+- **Effort:** 2-4 hours
+- **Risk if skipped:** HIGH — any IndexedDB hiccup silently corrupts state
+
+### TS2. Add "Soft Cancel" Recovery for Workouts
+- [ ] When canceling a workout, save it to a `recentlyCanceled` slot in localStorage (TTL: 10 min)
+- [ ] Show a "Resume last canceled workout" option on the WorkoutLogger empty state
+- [ ] After 10 minutes, the slot auto-expires
+- **Why:** Cancel is instant and irreversible. Accidental cancels lose all workout data.
+- **Files:** `src/context/WorkoutContext.tsx`, `src/pages/WorkoutLogger.tsx`
+- **Effort:** 3-5 hours
+
+### TS3. Harden the API Proxy
+- [ ] Add model whitelist: only allow specific models (e.g., gpt-4o-mini, gpt-4o)
+- [ ] Cap `max_tokens` at 4000 (prevents abuse)
+- [ ] Validate `messages` is a non-empty array (reject malformed requests)
+- [ ] Add a Referer/Origin check to reject requests not from your domain
+- [ ] Optional: basic rate limiting (20 requests/minute per IP)
+- **Why:** The proxy URL is in the JS bundle. Anyone who finds it can use your OpenAI key for anything.
+- **Files:** `api/openai/v1/chat/completions.js`
+- **Effort:** 2-4 hours
+- **Risk if skipped:** HIGH (financial) — someone could run up your OpenAI bill
+
+### TS4. Validate AI Response JSON Before Rendering
+- [ ] Add a validation function for `PostWorkoutReview` shape (Zod schema or manual checks)
+- [ ] In `ReviewCard.tsx`, validate after `JSON.parse()` instead of `as PostWorkoutReview` type assertion
+- [ ] If validation fails, fall through to the error state with a retry button (instead of rendering blank)
+- **Why:** AI responses are unpredictable. Malformed JSON silently renders nothing — no error, no retry.
+- **Files:** `src/components/ReviewCard.tsx`, `src/lib/ai/types.ts`
+- **Effort:** 2-4 hours
+
+---
+
+## Audit: UX Improvements
+
+> Features that make daily use feel faster and more natural.
+
+### UX1. Add "Repeat This Workout" to Workout Detail
+- [ ] Add a "Repeat" button to `WorkoutDetail.tsx`
+- [ ] Pre-fill exercises and sets from the historical workout data
+- [ ] Reuse the `startWorkout` + `updateExercises` pattern from `TemplateDetail.tsx` (lines ~63-77)
+- **Why:** Most natural user desire after viewing a past workout. Most workout apps offer this.
+- **Files:** `src/pages/WorkoutDetail.tsx`, `src/context/WorkoutContext.tsx`
+- **Effort:** 2-3 hours
+
+### UX2. Add "Fill From Last Session" to Workout Logger
+- [ ] Add a "Fill all from last time" button to the WorkoutLogger exercise list
+- [ ] Populate weight/reps from the most recent session for each exercise
+- [ ] The history query already exists in WorkoutLogger (lines ~137-154) but only runs per-exercise on add
+- **Why:** Biggest daily friction reducer. Users repeat similar weights most sessions.
+- **Files:** `src/pages/WorkoutLogger.tsx`, `src/components/ExerciseCard.tsx`
+- **Effort:** 3-5 hours
+
+### UX3. Template Lifecycle Improvements
+- [ ] Fix orphaned refs: when deleting a template, scan weeklyPlans and null out matching `dayAssignment.templateId` values
+- [ ] Add "Duplicate Template" button to `TemplateDetail.tsx`
+- [ ] Add "Save as Template" button to `WorkoutDetail.tsx` (for past ad-hoc workouts)
+- [ ] Fix hardcoded "kg" in WorkoutDetail.tsx — use user's `weightUnit` setting
+- **Why:** Templates are the backbone of the weekly plan system. Orphaned refs, no duplication, and no conversion from workouts create friction.
+- **Files:** `src/db/templateService.ts`, `src/db/weeklyPlanService.ts`, `src/pages/TemplateDetail.tsx`, `src/pages/WorkoutDetail.tsx`
+- **Effort:** 1-2 days
+
+---
+
+## Audit: Visual Polish
+
+> Consistency and error handling improvements.
+
+### VP1. Improve ErrorBoundary with Recovery + Friendly Message
+- [ ] Replace raw `error.toString()` with a user-friendly message
+- [ ] Add "Refresh" and "Go Home" buttons
+- [ ] Support dark mode (currently uses inline styles that ignore theme)
+- [ ] Optional: add global `window.onunhandledrejection` handler in `App.tsx` for async errors
+- **Files:** `src/components/ErrorBoundary.tsx`, possibly `src/App.tsx`
+- **Effort:** 3-5 hours
+
+### VP2. Extract Remaining Inline Styles
+- [ ] Readiness Pulse in `WorkoutLogger.tsx` (lines ~283-329): 8 nested elements all inline-styled → move to `WorkoutLogger.css`
+- [ ] `TemplateDetail.tsx` (lines ~139-265): 15+ elements with inline `style=` → create `TemplateDetail.css`
+- **Why:** These violate the pattern everywhere else. Makes theming and dark mode fixes harder.
+- **Files:** `WorkoutLogger.tsx` + `WorkoutLogger.css`, `TemplateDetail.tsx` + new `TemplateDetail.css`
+- **Effort:** 2-4 hours
+
+---
+
+## Recommended Implementation Order (Weeks 1-4)
+
+> **Week 1: Trust and Safety** — QW1, QW2, QW3, then TS1
+> **Week 2: Security and Polish** — TS3, QW4, QW5, TS4
+> **Week 3: User Value** — UX1, VP2, VP1
+> **Week 4: User Value + Quality** — UX2, TS2, UX3
 
 ---
 
@@ -252,3 +397,12 @@
   - `GoalSelectionGuard.tsx` reduced from 567 → 253 lines (55% reduction)
   - Fixed TS2322 type errors on `experienceLevel` / `coachPersona` (undefined → null coercion with `?? null`)
   - Build verified, zero TypeScript errors, wizard flow confirmed in preview
+
+### 2026-03-07
+- **Full Product + Codebase Audit** completed
+  - Scanned entire repo: ~85 files, ~14.8K lines across src/
+  - Identified 10 ranked recommendations, 5 quick wins, 3 medium projects, 2 bigger bets
+  - Added new sections to plan.md: Quick Wins (QW1-QW5), Trust & Safety (TS1-TS4), UX Improvements (UX1-UX3), Visual Polish (VP1-VP2)
+  - Top priorities: finishWorkout transaction safety (TS1), API proxy hardening (TS3), onboarding progress dots (QW2)
+  - Existing completed work preserved — all D1-D5 and A1-A5 tasks untouched
+  - 4-week implementation order added to plan.md

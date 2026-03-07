@@ -72,6 +72,7 @@ export default function WorkoutLogger() {
     const [isFinishSheetOpen, setIsFinishSheetOpen] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+    const [isFinishing, setIsFinishing] = useState(false);
 
     const handleSupersetUnlink = (sourceExId: string) => {
         const sourceEx = exercises.find(e => e.id === sourceExId);
@@ -343,10 +344,16 @@ export default function WorkoutLogger() {
                 templateName={templateName}
                 hasApiKey={!!config.apiKey}
                 hasChangesFromTemplate={hasChangesFromTemplate}
+                isFinishing={isFinishing}
                 onFinish={async (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => {
-                    setIsFinishSheetOpen(false);
-                    const goToCoach = await handleFinish(templateUpdateMode, sendToCoach);
-                    navigate(goToCoach ? '/coach' : '/');
+                    setIsFinishing(true);
+                    try {
+                        setIsFinishSheetOpen(false);
+                        const goToCoach = await handleFinish(templateUpdateMode, sendToCoach);
+                        navigate(goToCoach ? '/coach' : '/');
+                    } finally {
+                        setIsFinishing(false);
+                    }
                 }}
                 onCancel={() => setIsFinishSheetOpen(false)}
             />

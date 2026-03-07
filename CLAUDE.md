@@ -24,7 +24,7 @@ Please communicate with me accordingly at all times.
 - After finishing a task, summarize what changed in 1-2 sentences
 - Never use technical terms without explaining them first
 - If something breaks, tell me in plain English what went wrong before trying to fix it
-- Before each task, tell me which Claude model would be best to use and why (Haiku for simple tasks, Sonnet for most tasks, Opus for complex ones), then use it to save tokens
+- **Before each task AND before entering plan mode**, tell me which Claude model would be best to use and why (Haiku for simple tasks, Sonnet for most tasks, Opus for complex ones), then use it to save tokens
 
 ## Decision-making rules
 - Always ask me before making big structural changes
