@@ -71,6 +71,37 @@ export default function GoalSelectionGuard({ children }: { children: React.React
         }
     }, [profile]);
 
+    const handleDevSkip = async () => {
+        const allEquip = EQUIPMENT_DB.map(e => e.id);
+        const existingGyms = await db.gymProfiles.count();
+        if (existingGyms === 0) {
+            await db.gymProfiles.add({
+                id: `gym-${generateId()}`,
+                name: 'Commercial Gym',
+                availableEquipmentIds: allEquip,
+                customEquipment: []
+            });
+        }
+        await saveUserProfile({
+            goal: 'Strength',
+            experienceLevel: 'Intermediate',
+            targetWorkoutDays: 3,
+            coachPersona: 'Direct',
+            postWorkoutReview: 'Brief',
+            theme: 'System',
+            preferences: '',
+            createdAt: Date.now(),
+            weightUnit: 'lbs',
+            strengthBaselines: {},
+            isBeginnerNoWeights: false,
+            weightSuggestionUI: 'autofill',
+            motivation: 'dev skip',
+            currentBlockWeek: 1,
+            isBeginner: false,
+            onboardingComplete: true,
+        });
+    };
+
     const handleSave = async () => {
         if (!selectedGoal || !selectedExperience || !selectedEquipment || !selectedDays || !selectedPersona) return;
 
@@ -136,6 +167,12 @@ export default function GoalSelectionGuard({ children }: { children: React.React
                         <h1 className="welcome-title">Welcome to IronAI</h1>
                         <p className="welcome-subtitle">Your AI-powered workout coach that actually gets you</p>
                         <button className="welcome-start-btn" onClick={() => setStep(1)}>Get Started</button>
+                        <button
+                            onClick={handleDevSkip}
+                            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '11px', opacity: 0.4, cursor: 'pointer', marginTop: '8px', padding: '4px 8px' }}
+                        >
+                            skip (dev)
+                        </button>
                     </div>
                 )}
 

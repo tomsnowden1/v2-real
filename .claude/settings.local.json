@@ -9,7 +9,10 @@
       "Bash(kill 48719 51667)",
       "Bash(npm run build)",
       "Bash(ls -la /Users/jess/v2-real/.*)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(git -C /Users/jess/v2-real log --oneline -20)",
+      "Bash(grep -E \"recharts|axios|fetch|http\" /Users/jess/v2-real/src/**/*.ts)",
+      "Bash(wc -l /Users/jess/v2-real/src/**/*.tsx /Users/jess/v2-real/src/**/*.ts)"
     ]
   }
 }
