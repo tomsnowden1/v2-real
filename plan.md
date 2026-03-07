@@ -254,12 +254,13 @@
 > Consistency and error handling improvements.
 
 ### VP1. Improve ErrorBoundary with Recovery + Friendly Message
-- [ ] Replace raw `error.toString()` with a user-friendly message
-- [ ] Add "Refresh" and "Go Home" buttons
-- [ ] Support dark mode (currently uses inline styles that ignore theme)
-- [ ] Optional: add global `window.onunhandledrejection` handler in `App.tsx` for async errors
+- [x] Replace raw `error.toString()` with a user-friendly message
+- [x] Add "Refresh" and "Go Home" buttons
+- [x] Support dark mode (currently uses inline styles that ignore theme)
+- [x] Optional: add global `window.onunhandledrejection` handler in `App.tsx` for async errors
 - **Files:** `src/components/ErrorBoundary.tsx`, possibly `src/App.tsx`
 - **Effort:** 3-5 hours
+- **Completed:** 2026-03-07
 
 ### VP2. Extract Remaining Inline Styles
 - [x] Readiness Pulse in `WorkoutLogger.tsx` (lines ~283-329): 8 nested elements all inline-styled → move to `WorkoutLogger.css`
@@ -529,5 +530,16 @@
   - Created new TemplateDetail.css with semantic classes (.template-detail-page, .template-detail-header, .template-detail-name-input, .template-detail-start-btn, .template-detail-exercises, .template-detail-add-btn, .template-detail-delete-btn)
   - Updated both components to use CSS classes instead of inline styles
   - Improves code readability and simplifies theming/dark mode changes
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+- **VP1 Complete**: Improve ErrorBoundary with Recovery + Friendly Message
+  - Replaced raw error.toString() with friendly message: "Something went wrong"
+  - Added two action buttons: "Refresh Page" (reloads app) and "Go Home" (navigates to /)
+  - Created ErrorBoundary.css with semantic styling that respects dark mode theme
+  - Removed inline styles from ErrorBoundary.tsx (now uses CSS classes)
+  - Added optional window.onunhandledrejection handler in App.tsx to catch async errors outside React
+  - Errors still logged to console for debugging/monitoring
+  - User sees clear recovery path instead of technical stack traces
   - Build verified: no TypeScript errors
   - All 91 tests pass
