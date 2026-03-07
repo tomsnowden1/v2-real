@@ -213,4 +213,34 @@
 .resolve-footer button {
     padding: 10px 20px;
     min-width: 120px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.resolve-footer .secondary-btn {
+    background-color: var(--color-border);
+    color: var(--color-text-main);
+}
+
+.resolve-footer .secondary-btn:hover {
+    background-color: var(--color-text-muted);
+    color: var(--color-surface);
+}
+
+.resolve-footer .primary-btn {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.resolve-footer .primary-btn:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 4px 12px rgba(30, 189, 123, 0.3);
+}
+
+.resolve-footer .primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
