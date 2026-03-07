@@ -49,6 +49,13 @@ export default function WorkoutLogger() {
     const [readinessDone, setReadinessDone] = useState(false);
     const [weightScaleFactor, setWeightScaleFactor] = useState(1.0);
 
+    // Error toast state
+    const [errorToast, setErrorToast] = useState<string | null>(null);
+    const showErrorToast = (message: string) => {
+        setErrorToast(message);
+        setTimeout(() => setErrorToast(null), 4000);
+    };
+
     // Show the Readiness Pulse once when a workout becomes active
     useEffect(() => {
         if (isActive && !readinessDone) {
@@ -348,9 +355,18 @@ export default function WorkoutLogger() {
                 onFinish={async (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => {
                     setIsFinishing(true);
                     try {
+                        const result = await handleFinish(templateUpdateMode, sendToCoach);
+
+                        if (result.error) {
+                            showErrorToast(result.error);
+                            return;
+                        }
+
                         setIsFinishSheetOpen(false);
-                        const goToCoach = await handleFinish(templateUpdateMode, sendToCoach);
-                        navigate(goToCoach ? '/coach' : '/');
+                        navigate(result.goToCoach ? '/coach' : '/');
+                    } catch (error) {
+                        const message = error instanceof Error ? error.message : 'Unknown error';
+                        showErrorToast(`Save failed: ${message}`);
                     } finally {
                         setIsFinishing(false);
                     }
@@ -384,6 +400,12 @@ export default function WorkoutLogger() {
                 }}
                 onCancel={() => setIsTemplateModalOpen(false)}
             />
+
+            {errorToast && (
+                <div className="workout-logger-error-toast">
+                    {errorToast}
+                </div>
+            )}
 
         </div>
     );

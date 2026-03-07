@@ -16,7 +16,7 @@ interface WorkoutContextType {
     applySuggestion: (suggestion: AIWorkoutSuggestion, resolvedMap: Record<string, { id: string, name: string }>) => void;
     updateWorkoutName: (name: string) => void;
     updateExercises: (exs: WorkoutExercise[]) => void;
-    finishWorkout: () => Promise<void>;
+    finishWorkout: () => Promise<{ success: boolean; error?: string }>;
     cancelWorkout: () => void;
 }
 
@@ -105,8 +105,10 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
     const updateWorkoutName = (name: string) => setWorkoutName(name);
     const updateExercises = (exs: WorkoutExercise[]) => setExercises(exs);
 
-    const finishWorkout = async () => {
-        if (!isActive || !startTime) return;
+    const finishWorkout = async (): Promise<{ success: boolean; error?: string }> => {
+        if (!isActive || !startTime) {
+            return { success: false, error: 'No active workout' };
+        }
 
         const endTime = Date.now();
         const durationMs = endTime - startTime;
@@ -129,18 +131,37 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
             id: `wh-${generateId()}`,
         };
 
-        await db.workoutHistory.add(fullRecord);
-        await addCompletedWorkoutToWeek(fullRecord.id);
-
         try {
-            const { checkAndSavePRs } = await import('../db/prService');
-            await checkAndSavePRs(fullRecord);
-        } catch (error) {
-            console.error("Failed to check and save PRs", error);
-        }
+            // Wrap all three DB operations in a single transaction
+            await db.transaction('rw', db.workoutHistory, db.weeklyPlans, db.prs, async () => {
+                // Operation 1: Add workout to history
+                await db.workoutHistory.add(fullRecord);
 
-        // Clear active state
-        cancelWorkout();
+                // Operation 2: Update weekly plan
+                await addCompletedWorkoutToWeek(fullRecord.id);
+
+                // Operation 3: Check and save PRs
+                try {
+                    const { checkAndSavePRs } = await import('../db/prService');
+                    await checkAndSavePRs(fullRecord);
+                } catch (prError) {
+                    console.error('Failed to check and save PRs', prError);
+                    // Don't throw — PR detection failure shouldn't block workout save
+                }
+            });
+
+            // Clear active state only after successful transaction
+            cancelWorkout();
+            return { success: true };
+
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Transaction failed:', error);
+            return {
+                success: false,
+                error: `Failed to save workout: ${message}`
+            };
+        }
     };
 
     const cancelWorkout = () => {

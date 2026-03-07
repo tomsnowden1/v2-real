@@ -156,18 +156,20 @@
 - **Completed:** 2026-03-07 (came soon toast approach)
 
 ### QW4. Unify Modal Overlay Into One CSS Variable
-- [ ] Add `--color-overlay: rgba(0,0,0,0.6)` to `src/index.css`
-- [ ] Replace hardcoded overlays in: FinishWorkoutSheet.css (0.6), ReplaceModal.css (0.5), WorkoutDetail.css (0.5), GymEquipment.css (0.55), AdjustWeekModal.css (0.6), WeeklyCheckInModal.css (0.6), ResolveExercisesModal.css (0.6)
-- [ ] Replace inline style overlays in: `WorkoutLogger.tsx` (0.55), `Home.tsx` (0.6)
+- [x] Add `--color-overlay: rgba(0,0,0,0.6)` to `src/index.css`
+- [x] Replace hardcoded overlays in: FinishWorkoutSheet.css (0.6), ReplaceModal.css (0.5), WorkoutDetail.css (0.5), GymEquipment.css (0.55), AdjustWeekModal.css (0.6), WeeklyCheckInModal.css (0.6), ResolveExercisesModal.css (0.6)
+- [x] Replace inline style overlays in: `WorkoutLogger.tsx` (0.55), `Home.tsx` (0.6)
 - **Files:** `index.css` + 7 CSS files + 2 TSX files
 - **Effort:** 1-2 hours
+- **Completed:** 2026-03-07 (fixed 6 z-index bugs, unified overlays)
 
 ### QW5. Add `role="dialog"` + Escape Key to ConfirmModal
-- [ ] Add `role="dialog"` and `aria-modal="true"` to ConfirmModal wrapper
-- [ ] Add `onKeyDown` handler for Escape key
-- [ ] Since ConfirmModal is reused everywhere, this one fix helps all modals
+- [x] Add `role="dialog"` and `aria-modal="true"` to ConfirmModal wrapper
+- [x] Add `onKeyDown` handler for Escape key
+- [x] Since ConfirmModal is reused everywhere, this one fix helps all modals
 - **Files:** `src/components/ConfirmModal.tsx`
 - **Effort:** 2-3 hours
+- **Completed:** 2026-03-07 (30 minutes)
 
 ---
 

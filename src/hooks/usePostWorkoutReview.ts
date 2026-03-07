@@ -13,7 +13,7 @@ interface UsePostWorkoutReviewOptions {
     sourceTemplateId: string | null;
     config: AIConfig;
     provider: AIProvider;
-    finishWorkout: () => Promise<void>;
+    finishWorkout: () => Promise<{ success: boolean; error?: string }>;
 }
 
 interface UsePostWorkoutReviewReturn {
@@ -21,9 +21,9 @@ interface UsePostWorkoutReviewReturn {
     templateName: string | undefined;
     /**
      * Saves the workout, optionally enqueues a Coach review, returns whether
-     * the caller should navigate to /coach (true) or / (false).
+     * the caller should navigate to /coach (true) or / (false), or an error if save failed.
      */
-    handleFinish: (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => Promise<boolean>;
+    handleFinish: (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => Promise<{ goToCoach: boolean; error?: string }>;
 }
 
 export function usePostWorkoutReview({
@@ -60,7 +60,7 @@ export function usePostWorkoutReview({
     const handleFinish = async (
         templateUpdateMode: TemplateUpdateMode,
         sendToCoach: boolean
-    ): Promise<boolean> => {
+    ): Promise<{ goToCoach: boolean; error?: string }> => {
         // 1. Handle template update before finishing
         if (sourceTemplateId && templateUpdateMode !== 'none') {
             try {
@@ -74,8 +74,11 @@ export function usePostWorkoutReview({
             }
         }
 
-        // 2. Save the workout (also triggers PR detection and weekly plan update)
-        await finishWorkout();
+        // 2. Save the workout (with transaction protection)
+        const saveResult = await finishWorkout();
+        if (!saveResult.success) {
+            return { goToCoach: false, error: saveResult.error };
+        }
 
         // 3. Enqueue Coach review if requested
         if (sendToCoach && config.apiKey) {
@@ -88,21 +91,21 @@ export function usePostWorkoutReview({
                     timestamp: Date.now(),
                     type: 'text',
                 });
-                return true; // still navigate to coach
+                return { goToCoach: true }; // still navigate to coach
             }
 
             try {
                 // Idempotency: fetch the most recently saved workout
                 const allHistory = await db.workoutHistory.orderBy('startTime').reverse().toArray();
                 const lastWorkout = allHistory[0];
-                if (!lastWorkout) return false;
+                if (!lastWorkout) return { goToCoach: false };
 
                 // Check if a review for this workout already exists
                 const existing = await db.chatMessages
                     .where('reviewWorkoutId')
                     .equals(lastWorkout.id)
                     .first();
-                if (existing) return true; // already reviewed — just navigate to coach
+                if (existing) return { goToCoach: true }; // already reviewed — just navigate to coach
 
                 // Create pending placeholder message
                 const messageId = generateId();
@@ -119,14 +122,14 @@ export function usePostWorkoutReview({
                 // Fire-and-forget — the orchestrator updates the message when done
                 runReviewForWorkout(lastWorkout.id, messageId, provider, config);
 
-                return true; // navigate to /coach
+                return { goToCoach: true }; // navigate to /coach
             } catch (e) {
                 console.error('Failed to enqueue review:', e);
-                return false;
+                return { goToCoach: false };
             }
         }
 
-        return false; // navigate to /
+        return { goToCoach: false }; // navigate to /
     };
 
     return {
