@@ -283,7 +283,7 @@ export default function WorkoutLogger() {
             {/* ── Readiness Pulse ──────────────────────────────────────────────── */}
             {showReadinessPulse && (
                 <div
-                    style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+                    className="readiness-pulse-overlay"
                     onClick={() => { setShowReadinessPulse(false); setReadinessDone(true); }}
                 >
                     <div

@@ -130,3 +130,15 @@
     transform: scale(0.98);
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
+
+/* ── Template Confirmation Overlay ──────────────────────────────────────────── */
+.template-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: var(--color-overlay);
+    backdrop-filter: blur(4px);
+}

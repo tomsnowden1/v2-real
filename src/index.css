@@ -32,6 +32,9 @@
   --z-modal: 100;
   --z-toast: 110;
 
+  /* Overlay backdrop for modals */
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
   /* Spacing */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -60,6 +63,9 @@
   --color-text-main: #f8fafc;
   --color-text-muted: #94a3b8;
   --color-border: #334155;
+
+  /* Overlay backdrop for modals */
+  --color-overlay: rgba(0, 0, 0, 0.6);
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);

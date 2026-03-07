@@ -148,11 +148,12 @@
 - **Completed:** 2026-03-07
 
 ### QW3. Fix Dead "+ Custom" Button in Exercise Library
-- [ ] Wire up `onClick` handler on `ExerciseLibrary.tsx` line ~52
-- [ ] Add a small form modal (name, body part, category) or at minimum a "Coming soon" toast
-- [ ] The `isCustom` flag already exists on the Exercise interface in `database.ts`
+- [x] Wire up `onClick` handler on `ExerciseLibrary.tsx` line ~52
+- [x] Add a small form modal (name, body part, category) or at minimum a "Coming soon" toast
+- [x] The `isCustom` flag already exists on the Exercise interface in `database.ts`
 - **Files:** `src/pages/ExerciseLibrary.tsx`, `src/db/exerciseService.ts`
 - **Effort:** 1-3 hours (basic form) or 15 min (coming soon toast)
+- **Completed:** 2026-03-07 (came soon toast approach)
 
 ### QW4. Unify Modal Overlay Into One CSS Variable
 - [ ] Add `--color-overlay: rgba(0,0,0,0.6)` to `src/index.css`
@@ -423,5 +424,15 @@
   - Passed `dots` prop to all 9 WizardShell components (steps 1-9)
   - Non-beginner + Strength/Hypertrophy goals show 10 steps; Beginner + Consistency show 8 steps
   - Users now see progress indicator updating as they advance through wizard
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+- **QW3 Complete**: Fix Dead "+ Custom" Button in Exercise Library
+  - Added toast state and showToast helper function to ExerciseLibrary.tsx (copied pattern from Coach.tsx)
+  - Wired onClick handler to button showing "Custom exercises coming soon!" message
+  - Added .exercise-library-toast CSS styling with animations (based on Coach.css pattern)
+  - Toast displays for 3 seconds and auto-dismisses
+  - Honest UX approach: gives users immediate feedback without false promises
+  - Database already supports custom exercises (isCustom flag exists), ready for full form feature later
   - Build verified: no TypeScript errors
   - All 91 tests pass

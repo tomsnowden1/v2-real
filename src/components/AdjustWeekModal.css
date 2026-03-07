@@ -4,9 +4,9 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: var(--color-overlay);
     backdrop-filter: blur(4px);
-    z-index: 999;
+    z-index: var(--z-modal);
     display: flex;
     align-items: flex-end;
     /* Mobile bottom sheet style */

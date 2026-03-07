@@ -261,7 +261,7 @@ export default function Home() {
 
             {templateToStart && (
                 <div
-                    style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                    className="template-confirm-overlay"
                     onClick={() => setTemplateToStart(null)}
                 >
                     <div
