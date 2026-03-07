@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import './ConfirmModal.css';
 
 interface ConfirmModalProps {
@@ -21,10 +22,24 @@ export default function ConfirmModal({
     onConfirm,
     onCancel
 }: ConfirmModalProps) {
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                onCancel();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onCancel]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay">
+        <div className="modal-overlay" role="dialog" aria-modal="true">
             <div className="modal-content confirm-modal">
                 <h3 className="modal-title">{title}</h3>
                 <p className="modal-message">{message}</p>
