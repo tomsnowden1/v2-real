@@ -231,12 +231,13 @@
 - **Effort:** 2-3 hours
 
 ### UX2. Add "Fill From Last Session" to Workout Logger
-- [ ] Add a "Fill all from last time" button to the WorkoutLogger exercise list
-- [ ] Populate weight/reps from the most recent session for each exercise
-- [ ] The history query already exists in WorkoutLogger (lines ~137-154) but only runs per-exercise on add
+- [x] Add a "Fill all from last time" button to the WorkoutLogger exercise list
+- [x] Populate weight/reps from the most recent session for each exercise
+- [x] The history query already exists in WorkoutLogger (lines ~137-154) but only runs per-exercise on add
 - **Why:** Biggest daily friction reducer. Users repeat similar weights most sessions.
 - **Files:** `src/pages/WorkoutLogger.tsx`, `src/components/ExerciseCard.tsx`
 - **Effort:** 3-5 hours
+- **Completed:** 2026-03-07
 
 ### UX3. Template Lifecycle Improvements
 - [ ] Fix orphaned refs: when deleting a template, scan weeklyPlans and null out matching `dayAssignment.templateId` values
@@ -541,5 +542,18 @@
   - Added optional window.onunhandledrejection handler in App.tsx to catch async errors outside React
   - Errors still logged to console for debugging/monitoring
   - User sees clear recovery path instead of technical stack traces
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+- **UX2 Complete**: Add "Fill From Last Session" to Workout Logger
+  - Added `handleFillFromLastSession()` function to WorkoutLogger.tsx
+  - Queries db.workoutHistory for each exercise in current workout
+  - Finds most recent session containing that exerciseId
+  - Extracts weight/reps from the last set performed
+  - Auto-fills all empty sets (weight=0, reps=0) with previous values
+  - Added "Fill from Last" button with Copy icon in exercises-list-controls
+  - Button positioned alongside "Save as Template" and "Cancel" buttons
+  - Tooltip explains: "Fill empty weights from your last workout"
+  - Reduces daily friction: most users repeat similar weights each session
   - Build verified: no TypeScript errors
   - All 91 tests pass
