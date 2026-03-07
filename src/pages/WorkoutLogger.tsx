@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useWorkout } from '../context/WorkoutContext';
+import { useWorkout, getRecentlyCanceledWorkout } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
 import { useAIProvider } from '../hooks/useAIProvider';
 import { useWorkoutTimer } from '../hooks/useWorkoutTimer';
@@ -28,7 +28,8 @@ export default function WorkoutLogger() {
         updateWorkoutName,
         updateExercises,
         finishWorkout,
-        cancelWorkout
+        cancelWorkout,
+        resumeRecentlyCanceledWorkout
     } = useWorkout();
     const { config, provider } = useAIProvider();
     const navigate = useNavigate();
@@ -55,6 +56,15 @@ export default function WorkoutLogger() {
         setErrorToast(message);
         setTimeout(() => setErrorToast(null), 4000);
     };
+
+    // Recently canceled workout recovery
+    const [hasRecentlyCanceled, setHasRecentlyCanceled] = useState(false);
+    useEffect(() => {
+        // Check for recently canceled workout when empty state is shown
+        if (!isActive || !startTime) {
+            setHasRecentlyCanceled(!!getRecentlyCanceledWorkout());
+        }
+    }, [isActive, startTime]);
 
     // Show the Readiness Pulse once when a workout becomes active
     useEffect(() => {
@@ -101,6 +111,15 @@ export default function WorkoutLogger() {
                 <Dumbbell size={64} color="var(--color-border)" className="empty-state-icon" />
                 <h1 className="empty-state-title">Ready to work?</h1>
                 <p className="empty-state-description">Start an empty workout or head to the Coach tab to get an AI-generated routine.</p>
+                {hasRecentlyCanceled && (
+                    <button
+                        onClick={() => resumeRecentlyCanceledWorkout()}
+                        className="resume-workout-btn"
+                    >
+                        <Play size={16} />
+                        Resume Last Workout
+                    </button>
+                )}
                 <button
                     onClick={() => startWorkout()}
                     className="start-workout-btn"

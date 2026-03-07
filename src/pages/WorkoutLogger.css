@@ -133,6 +133,26 @@
     margin-bottom: 30px;
 }
 
+.resume-workout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: rgba(30, 189, 123, 0.12);
+    color: var(--color-primary);
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    border: 1px solid var(--color-primary);
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.resume-workout-btn:hover {
+    background-color: rgba(30, 189, 123, 0.2);
+}
+
 .start-workout-btn {
     background-color: var(--color-primary);
     color: white;

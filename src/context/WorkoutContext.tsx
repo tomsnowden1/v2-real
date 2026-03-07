@@ -6,6 +6,34 @@ import { calculateWorkoutScore } from '../lib/scoringEngine';
 import { generateId } from '../lib/id';
 import type { AIWorkoutSuggestion } from '../lib/ai/types';
 
+// ─── Recently Canceled Workout Recovery ────────────────────────────────────
+// Save/load/cleanup logic for accidental cancellations (10-minute TTL)
+
+export function getRecentlyCanceledWorkout() {
+    const saved = localStorage.getItem(RECENTLY_CANCELED_KEY);
+    if (!saved) return null;
+
+    try {
+        const data = JSON.parse(saved);
+        const age = Date.now() - data.canceledAt;
+
+        // Expired (older than 10 minutes)
+        if (age > CANCEL_TTL_MS) {
+            localStorage.removeItem(RECENTLY_CANCELED_KEY);
+            return null;
+        }
+
+        return data.workout;
+    } catch (e) {
+        console.error('Failed to parse canceled workout', e);
+        return null;
+    }
+}
+
+export function clearRecentlyCanceledWorkout() {
+    localStorage.removeItem(RECENTLY_CANCELED_KEY);
+}
+
 interface WorkoutContextType {
     isActive: boolean;
     workoutName: string;
@@ -18,11 +46,14 @@ interface WorkoutContextType {
     updateExercises: (exs: WorkoutExercise[]) => void;
     finishWorkout: () => Promise<{ success: boolean; error?: string }>;
     cancelWorkout: () => void;
+    resumeRecentlyCanceledWorkout: () => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'ironai_active_workout';
+const RECENTLY_CANCELED_KEY = 'ironai_recently_canceled_workout';
+const CANCEL_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 export function WorkoutProvider({ children }: { children: ReactNode }) {
     const [isActive, setIsActive] = useState(false);
@@ -165,12 +196,38 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
     };
 
     const cancelWorkout = () => {
+        // Save current state for recovery (10-minute TTL)
+        if (isActive) {
+            localStorage.setItem(RECENTLY_CANCELED_KEY, JSON.stringify({
+                canceledAt: Date.now(),
+                workout: {
+                    workoutName,
+                    exercises,
+                    startTime,
+                    sourceTemplateId
+                }
+            }));
+        }
+
+        // Clear active state
         setIsActive(false);
         setWorkoutName('New Workout');
         setExercises([]);
         setStartTime(null);
         setSourceTemplateId(null);
         localStorage.removeItem(STORAGE_KEY);
+    };
+
+    const resumeRecentlyCanceledWorkout = () => {
+        const canceled = getRecentlyCanceledWorkout();
+        if (canceled) {
+            setIsActive(true);
+            setWorkoutName(canceled.workoutName);
+            setExercises(canceled.exercises);
+            setStartTime(canceled.startTime);
+            setSourceTemplateId(canceled.sourceTemplateId || null);
+            clearRecentlyCanceledWorkout();
+        }
     };
 
     return (
@@ -185,7 +242,8 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
             updateWorkoutName,
             updateExercises,
             finishWorkout,
-            cancelWorkout
+            cancelWorkout,
+            resumeRecentlyCanceledWorkout
         }}>
             {children}
         </WorkoutContext.Provider>
