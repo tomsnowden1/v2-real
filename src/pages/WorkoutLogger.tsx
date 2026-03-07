@@ -14,7 +14,7 @@ import { db } from '../db/database';
 import { getUserProfile } from '../db/userProfileService';
 import { findOrCreateExerciseByName } from '../db/exerciseService';
 import { generateId } from '../lib/id';
-import { Plus, Play, Dumbbell, Bookmark } from 'lucide-react';
+import { Plus, Play, Dumbbell, Bookmark, Copy } from 'lucide-react';
 import './WorkoutLogger.css';
 
 export default function WorkoutLogger() {
@@ -192,6 +192,47 @@ export default function WorkoutLogger() {
         setExerciseToReplace(null);
     };
 
+    const handleFillFromLastSession = async () => {
+        try {
+            const updatedExercises = await Promise.all(
+                exercises.map(async (ex) => {
+                    // Find the most recent workout that includes this exercise
+                    const history = await db.workoutHistory
+                        .orderBy('startTime')
+                        .reverse()
+                        .toArray();
+
+                    for (const workout of history) {
+                        const lastExercise = workout.exercises.find(
+                            (e) => e.exerciseId === ex.exerciseId
+                        );
+
+                        if (lastExercise && lastExercise.sets.length > 0) {
+                            // Get the last set from the previous workout
+                            const lastSet = lastExercise.sets[lastExercise.sets.length - 1];
+
+                            // Fill all empty sets in current exercise with these values
+                            const filledSets = ex.sets.map((s) =>
+                                s.weight === 0 && s.reps === 0
+                                    ? { ...s, weight: lastSet.weight, reps: lastSet.reps }
+                                    : s
+                            );
+
+                            return { ...ex, sets: filledSets };
+                        }
+                    }
+
+                    // No previous data found, return unchanged
+                    return ex;
+                })
+            );
+
+            updateExercises(updatedExercises);
+        } catch (e) {
+            console.error('Failed to fill from last session', e);
+        }
+    };
+
     return (
         <div className="workout-page">
             <header className="workout-header">
@@ -288,6 +329,14 @@ export default function WorkoutLogger() {
                 </button>
 
                 <div className="exercises-list-controls">
+                    <button
+                        className="add-exercise-btn fill-from-last-btn"
+                        onClick={handleFillFromLastSession}
+                        title="Fill empty weights from your last workout"
+                    >
+                        <Copy size={20} />
+                        Fill from Last
+                    </button>
                     <button
                         className="add-exercise-btn save-template-btn"
                         onClick={() => setIsTemplateModalOpen(true)}
