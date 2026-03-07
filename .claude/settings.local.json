@@ -7,7 +7,9 @@
       "Bash(npm install --prefix \"/Users/jess/v2 /server\")",
       "Bash(lsof -ti:5173,5174)",
       "Bash(kill 48719 51667)",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(ls -la /Users/jess/v2-real/.*)",
+      "Bash(xargs cat)"
     ]
   }
 }

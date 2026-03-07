@@ -38,10 +38,31 @@ Please communicate with me accordingly at all times.
 - Commit to git after each working feature
 
 ## My tech stack
-[To be filled in: Ask Claude after first session, or write here once decided. Example: "Next.js website, deployed on Vercel, database on Supabase"]
+- Vite + React 19 + TypeScript (single-page app, NOT Next.js)
+- Database: Dexie (IndexedDB) — fully client-side, no backend database
+- AI: OpenAI via serverless proxy function (API key stays server-side)
+- PWA: vite-plugin-pwa with offline support and installable app
+- Styling: plain CSS + clsx utility
+- Charts: recharts
+- Icons: lucide-react
 
 ## Deployment
-[To be filled in: Example: "This deploys to Vercel. Always make sure the app works locally before deploying."]
+This deploys to Vercel via GitHub (push to main = auto-deploy).
+
+**How it works:**
+- Vercel runs `npm run build` which produces static files in `dist/`
+- AI calls go through a serverless function at `api/openai/v1/chat/completions.js` — this keeps the OpenAI key server-side
+- The `.env.production` file enables proxy mode automatically for production builds
+
+**Vercel dashboard setup:**
+- `OPENAI_API_KEY` must be set as an environment variable (Production only)
+- NEVER set `VITE_OPENAI_API_KEY` in Vercel — the VITE_ prefix bakes it into the JavaScript bundle and exposes it to users
+
+**Before deploying, always:**
+1. Run `npm run build` locally to check for errors
+2. Run `npm run test:run` to make sure tests pass
+
+**Cloud Run files** (Dockerfile, server/) are kept for possible future use but are not part of the Vercel deployment.
 
 ## Things I always want
 - Save points: commit to git after every feature that works
