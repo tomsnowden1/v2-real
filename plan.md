@@ -262,11 +262,12 @@
 - **Effort:** 3-5 hours
 
 ### VP2. Extract Remaining Inline Styles
-- [ ] Readiness Pulse in `WorkoutLogger.tsx` (lines ~283-329): 8 nested elements all inline-styled → move to `WorkoutLogger.css`
-- [ ] `TemplateDetail.tsx` (lines ~139-265): 15+ elements with inline `style=` → create `TemplateDetail.css`
+- [x] Readiness Pulse in `WorkoutLogger.tsx` (lines ~283-329): 8 nested elements all inline-styled → move to `WorkoutLogger.css`
+- [x] `TemplateDetail.tsx` (lines ~139-265): 15+ elements with inline `style=` → create `TemplateDetail.css`
 - **Why:** These violate the pattern everywhere else. Makes theming and dark mode fixes harder.
 - **Files:** `WorkoutLogger.tsx` + `WorkoutLogger.css`, `TemplateDetail.tsx` + new `TemplateDetail.css`
 - **Effort:** 2-4 hours
+- **Completed:** 2026-03-07
 
 ---
 
@@ -519,5 +520,14 @@
   - Updated WorkoutLogger.tsx to check for recently canceled workout on mount, show resume button if available
   - Added .resume-workout-btn styling (green outline button with Play icon, appears above primary button)
   - Auto-expires after 10 minutes to avoid clutter while preventing accidental data loss
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+- **VP2 Complete**: Extract Remaining Inline Styles
+  - Readiness Pulse (WorkoutLogger.tsx): Moved 8 nested inline styles to CSS classes (.readiness-pulse-sheet, .readiness-pulse-header, .readiness-pulse-buttons, .readiness-pulse-btn, .readiness-pulse-emoji, .readiness-pulse-label, .readiness-pulse-skip)
+  - TemplateDetail.tsx: Extracted 15+ inline styles (header, input, buttons, sections)
+  - Created new TemplateDetail.css with semantic classes (.template-detail-page, .template-detail-header, .template-detail-name-input, .template-detail-start-btn, .template-detail-exercises, .template-detail-add-btn, .template-detail-delete-btn)
+  - Updated both components to use CSS classes instead of inline styles
+  - Improves code readability and simplifies theming/dark mode changes
   - Build verified: no TypeScript errors
   - All 91 tests pass

@@ -1,4 +1,5 @@
 import React from 'react';
+import './ErrorBoundary.css';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
@@ -23,14 +24,36 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         console.error("Uncaught error:", error, errorInfo);
     }
 
+    handleRefresh = () => {
+        window.location.reload();
+    };
+
+    handleGoHome = () => {
+        window.location.href = '/';
+    };
+
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{ padding: '2rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', margin: '2rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Something went wrong.</h2>
-                    <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem' }}>
-                        {this.state.error && this.state.error.toString()}
-                    </pre>
+                <div className="error-boundary-container">
+                    <h2 className="error-boundary-title">Something went wrong</h2>
+                    <p className="error-boundary-message">
+                        We encountered an unexpected error. Try refreshing the page or go back home.
+                    </p>
+                    <div className="error-boundary-actions">
+                        <button
+                            className="error-boundary-btn error-boundary-btn-primary"
+                            onClick={this.handleRefresh}
+                        >
+                            Refresh Page
+                        </button>
+                        <button
+                            className="error-boundary-btn error-boundary-btn-secondary"
+                            onClick={this.handleGoHome}
+                        >
+                            Go Home
+                        </button>
+                    </div>
                 </div>
             );
         }

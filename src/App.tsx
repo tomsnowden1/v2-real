@@ -35,6 +35,16 @@ function App() {
     seedDatabase().catch(console.error);
   }, []);
 
+  // Catch unhandled promise rejections (async errors outside React)
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+  }, []);
+
   useEffect(() => {
     const root = document.documentElement;
     const theme = profile?.theme || 'System';
