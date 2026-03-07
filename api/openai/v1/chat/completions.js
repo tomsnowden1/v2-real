@@ -9,13 +9,67 @@
 // limits (platform.openai.com → Settings → Limits) instead.
 
 export default async function handler(req, res) {
+    // 1. Method validation
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // 2. Origin validation (development-aware)
+    const referer = req.headers.referer || '';
+    const isLocalhost = referer.startsWith('http://localhost:') || referer.startsWith('http://127.0.0.1:');
+    const isProduction = !isLocalhost && (
+        referer.startsWith('https://ironai-workout.vercel.app') ||
+        referer.startsWith('https://ironai.vercel.app')
+    );
+
+    if (!isLocalhost && !isProduction) {
+        return res.status(403).json({ error: 'Origin not allowed' });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
         return res.status(500).json({ error: 'Server is not configured with an OpenAI API key.' });
+    }
+
+    const body = req.body;
+
+    // 3. Request body validation
+    if (!body || typeof body !== 'object') {
+        return res.status(400).json({ error: 'Invalid request body' });
+    }
+
+    // 4. Model whitelist
+    const allowedModels = ['gpt-4o-mini', 'gpt-4o'];
+    if (!allowedModels.includes(body.model)) {
+        return res.status(400).json({
+            error: `Model '${body.model}' not allowed. Allowed models: ${allowedModels.join(', ')}`
+        });
+    }
+
+    // 5. Messages validation
+    if (!Array.isArray(body.messages) || body.messages.length === 0) {
+        return res.status(400).json({ error: 'messages must be a non-empty array' });
+    }
+
+    // 6. Token limit cap
+    const maxTokens = 4000;
+    if (body.max_tokens && body.max_tokens > maxTokens) {
+        return res.status(400).json({
+            error: `max_tokens cannot exceed ${maxTokens}`
+        });
+    }
+
+    // 7. Sanitize request — only pass allowed fields to OpenAI
+    const sanitizedBody = {
+        model: body.model,
+        messages: body.messages,
+        temperature: body.temperature !== undefined ? Math.min(Math.max(body.temperature, 0), 2) : 0.7,
+        top_p: body.top_p !== undefined ? Math.min(Math.max(body.top_p, 0), 1) : 1,
+    };
+
+    // Only include max_tokens if provided
+    if (body.max_tokens) {
+        sanitizedBody.max_tokens = body.max_tokens;
     }
 
     try {
@@ -25,7 +79,7 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
             },
-            body: JSON.stringify(req.body),
+            body: JSON.stringify(sanitizedBody),
         });
 
         const data = await openaiRes.json();
