@@ -313,6 +313,30 @@
     border-color: var(--color-primary);
 }
 
+/* ── Save as Template Button ─────────────────────────────────────── */
+.wd-save-template-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: var(--spacing-md);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: #3b82f6;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wd-save-template-btn:hover {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: #3b82f6;
+}
+
 /* ── Delete Button ───────────────────────────────────────────────── */
 .wd-delete-btn {
     display: flex;

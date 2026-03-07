@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type WorkoutExercise } from '../db/database';
 import { useWorkout } from '../context/WorkoutContext';
-import { ChevronLeft, Play, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, Play, Plus, Trash2, Copy } from 'lucide-react';
 import ExerciseCard from '../components/ExerciseCard';
 import ReplaceModal from '../components/ReplaceModal';
 import ConfirmModal from '../components/ConfirmModal';
-import { deleteTemplate } from '../db/templateService';
+import { deleteTemplate, saveAsTemplate } from '../db/templateService';
 import { findOrCreateExerciseByName } from '../db/exerciseService';
 import { generateId } from '../lib/id';
 import './TemplateDetail.css';
@@ -26,6 +26,7 @@ export default function TemplateDetail() {
     const [isReplaceModalOpen, setIsReplaceModalOpen] = useState(false);
     const [exerciseToReplace, setExerciseToReplace] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
 
     // Sync local name with db when loaded
     useEffect(() => {
@@ -83,6 +84,12 @@ export default function TemplateDetail() {
             await deleteTemplate(id);
             navigate('/templates', { replace: true });
         }
+    };
+
+    const handleDuplicate = async () => {
+        setIsDuplicateModalOpen(false);
+        const copy = await saveAsTemplate(`${template.name} (Copy)`, template.exercises);
+        navigate(`/templates/${copy.id}`);
     };
 
     const handleMoveUp = (index: number) => {
@@ -210,6 +217,13 @@ export default function TemplateDetail() {
 
             <div className="template-detail-delete-section">
                 <button
+                    onClick={() => setIsDuplicateModalOpen(true)}
+                    className="template-detail-duplicate-btn"
+                >
+                    <Copy size={20} />
+                    Duplicate Template
+                </button>
+                <button
                     onClick={() => setIsDeleteModalOpen(true)}
                     className="template-detail-delete-btn"
                 >
@@ -223,6 +237,15 @@ export default function TemplateDetail() {
                 isAdd={!exerciseToReplace}
                 onClose={() => setIsReplaceModalOpen(false)}
                 onReplace={handleReplace}
+            />
+
+            <ConfirmModal
+                isOpen={isDuplicateModalOpen}
+                title="Duplicate Template?"
+                message={`Creates a copy of "${template.name}" that you can edit independently.`}
+                confirmText="Duplicate"
+                onConfirm={handleDuplicate}
+                onCancel={() => setIsDuplicateModalOpen(false)}
             />
 
             <ConfirmModal

@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
+import { getUserProfile } from '../db/userProfileService';
 import { useWorkout } from '../context/WorkoutContext';
 import { generateId } from '../lib/id';
-import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2, Play } from 'lucide-react';
+import { saveAsTemplate } from '../db/templateService';
+import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2, Play, Bookmark } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
 import ScoreRing from '../components/ScoreRing';
 import './WorkoutDetail.css';
 
@@ -13,11 +16,15 @@ export default function WorkoutDetail() {
     const navigate = useNavigate();
     const { startWorkout, updateExercises, isActive } = useWorkout();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
 
     const workout = useLiveQuery(
         () => db.workoutHistory.get(id as string),
         [id]
     );
+
+    const userProfile = useLiveQuery(() => getUserProfile());
+    const weightUnit = userProfile?.weightUnit ?? 'lbs';
 
     // ── helpers ──────────────────────────────────────────────────────
     const formatDate = (timestamp?: number) => {
@@ -97,6 +104,14 @@ export default function WorkoutDetail() {
         navigate('/history', { replace: true });
     };
 
+    // ── save as template handler ─────────────────────────────────────
+    const handleSaveAsTemplate = async () => {
+        setShowSaveTemplateModal(false);
+        if (!workout) return;
+        await saveAsTemplate(workout.name, workout.exercises);
+        navigate('/templates');
+    };
+
     // ── loading / not-found ─────────────────────────────────────────
     if (workout === undefined) {
         return <div className="page-content wd-page" style={{ padding: 20 }}>Loading…</div>;
@@ -149,7 +164,7 @@ export default function WorkoutDetail() {
                         <div className="wd-stat">
                             <Dumbbell size={18} />
                             <div>
-                                <span className="wd-stat-value">{totalVolume.toLocaleString()} kg</span>
+                                <span className="wd-stat-value">{totalVolume.toLocaleString()} {weightUnit}</span>
                                 <span className="wd-stat-label">Total Volume</span>
                             </div>
                         </div>
@@ -181,7 +196,7 @@ export default function WorkoutDetail() {
                         <div className="wd-ex-header">
                             <span className="wd-ex-index">{idx + 1}</span>
                             <h3 className="wd-ex-name">{ex.exerciseName || ex.exerciseId}</h3>
-                            <span className="wd-ex-vol">{exerciseVolume(ex.sets).toLocaleString()} kg</span>
+                            <span className="wd-ex-vol">{exerciseVolume(ex.sets).toLocaleString()} {weightUnit}</span>
                         </div>
 
                         <div className="wd-sets-table">
@@ -200,7 +215,7 @@ export default function WorkoutDetail() {
                                     <span className={`wd-set-col-type wd-badge wd-badge-${set.type}`}>
                                         {setTypeLabel(set.type)}
                                     </span>
-                                    <span className="wd-set-col-weight">{set.weight} kg</span>
+                                    <span className="wd-set-col-weight">{set.weight} {weightUnit}</span>
                                     <span className="wd-set-col-reps">× {set.reps}</span>
                                 </div>
                             ))}
@@ -213,11 +228,25 @@ export default function WorkoutDetail() {
                     <Play size={18} />
                     Repeat This Workout
                 </button>
+                <button className="wd-save-template-btn" onClick={() => setShowSaveTemplateModal(true)}>
+                    <Bookmark size={18} />
+                    Save as Template
+                </button>
                 <button className="wd-delete-btn" onClick={() => setShowDeleteModal(true)}>
                     <Trash2 size={18} />
                     Delete Workout
                 </button>
             </div>
+
+            {/* ── Save as Template Modal ─────────────────────────────── */}
+            <ConfirmModal
+                isOpen={showSaveTemplateModal}
+                title="Save as Template?"
+                message={`Saves "${workout?.name}" to your Templates library so you can reuse it.`}
+                confirmText="Save Template"
+                onConfirm={handleSaveAsTemplate}
+                onCancel={() => setShowSaveTemplateModal(false)}
+            />
 
             {/* ── Delete Modal ───────────────────────────────────────── */}
             {showDeleteModal && (

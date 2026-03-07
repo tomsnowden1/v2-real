@@ -240,10 +240,11 @@
 - **Completed:** 2026-03-07
 
 ### UX3. Template Lifecycle Improvements
-- [ ] Fix orphaned refs: when deleting a template, scan weeklyPlans and null out matching `dayAssignment.templateId` values
-- [ ] Add "Duplicate Template" button to `TemplateDetail.tsx`
-- [ ] Add "Save as Template" button to `WorkoutDetail.tsx` (for past ad-hoc workouts)
-- [ ] Fix hardcoded "kg" in WorkoutDetail.tsx — use user's `weightUnit` setting
+- [x] Fix orphaned refs: when deleting a template, scan weeklyPlans and null out matching `dayAssignment.templateId` values
+- [x] Add "Duplicate Template" button to `TemplateDetail.tsx`
+- [x] Add "Save as Template" button to `WorkoutDetail.tsx` (for past ad-hoc workouts)
+- [x] Fix hardcoded "kg" in WorkoutDetail.tsx — use user's `weightUnit` setting
+- **Completed:** 2026-03-07
 - **Why:** Templates are the backbone of the weekly plan system. Orphaned refs, no duplication, and no conversion from workouts create friction.
 - **Files:** `src/db/templateService.ts`, `src/db/weeklyPlanService.ts`, `src/pages/TemplateDetail.tsx`, `src/pages/WorkoutDetail.tsx`
 - **Effort:** 1-2 days
@@ -566,5 +567,16 @@
   - Button positioned alongside "Save as Template" and "Cancel" buttons
   - Tooltip explains: "Fill empty weights from your last workout"
   - Reduces daily friction: most users repeat similar weights each session
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+### 2026-03-07 (continued, UX3)
+- **UX3 Complete**: Template Lifecycle Improvements
+  - `templateService.ts`: Added `removeTemplateFromWeeklyPlans()` — scans all weeklyPlans and nulls out any `dayAssignment.templateId` matching the deleted template; `deleteTemplate()` now calls this automatically
+  - `TemplateDetail.tsx`: Added "Duplicate Template" button + ConfirmModal; handler calls `saveAsTemplate()` with `(Copy)` suffix and navigates to the new template
+  - `TemplateDetail.css`: Added `.template-detail-duplicate-btn` neutral outline style (positioned above the red delete button)
+  - `WorkoutDetail.tsx`: Fixed 3× hardcoded "kg" → `{weightUnit}` (total volume, per-exercise volume, per-set weight); uses `getUserProfile()` via `useLiveQuery`
+  - `WorkoutDetail.tsx`: Added "Save as Template" button + ConfirmModal; saves past workout as a reusable template and navigates to /templates
+  - `WorkoutDetail.css`: Added `.wd-save-template-btn` blue outline style
   - Build verified: no TypeScript errors
   - All 91 tests pass

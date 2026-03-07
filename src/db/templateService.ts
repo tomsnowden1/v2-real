@@ -22,7 +22,26 @@ export async function saveAsTemplate(name: string, exercises: WorkoutExercise[])
 }
 
 export async function deleteTemplate(id: string): Promise<void> {
+    await removeTemplateFromWeeklyPlans(id);
     await db.templates.delete(id);
+}
+
+/**
+ * Nulls out any dayAssignment.templateId references pointing to the given template
+ * across all weekly plans. Called automatically by deleteTemplate.
+ */
+export async function removeTemplateFromWeeklyPlans(templateId: string): Promise<void> {
+    const allPlans = await db.weeklyPlans.toArray();
+    for (const plan of allPlans) {
+        if (!plan.dayAssignments) continue;
+        const hasRef = plan.dayAssignments.some(d => d.templateId === templateId);
+        if (hasRef) {
+            const cleaned = plan.dayAssignments.map(d =>
+                d.templateId === templateId ? { ...d, templateId: null } : d
+            );
+            await db.weeklyPlans.update(plan.id, { dayAssignments: cleaned });
+        }
+    }
 }
 
 /**
