@@ -12,7 +12,9 @@ export const isProxyMode = !!(import.meta.env.VITE_AI_PROXY_URL as string | unde
 
 export interface AIConfig {
     providerId: string;
-    apiKey: string | null;
+    apiKey: string | null;        // OpenAI key
+    anthropicKey: string | null;  // User's own Anthropic key (BYOK)
+    geminiKey: string | null;     // User's own Gemini key (BYOK)
     selectedModel: string;
     monthlyBudgetCap: number | null;
     currentUsageUsd: number;
@@ -22,6 +24,8 @@ export interface AIConfig {
 const DEFAULT_CONFIG: AIConfig = {
     providerId: DEFAULT_PROVIDER_ID,
     apiKey: null,
+    anthropicKey: null,
+    geminiKey: null,
     selectedModel: PROVIDER_MODELS[DEFAULT_PROVIDER_ID][0].id,
     monthlyBudgetCap: null,
     currentUsageUsd: 0,
@@ -95,13 +99,23 @@ export function useAIProvider() {
     // Get the actual implementation class
     const provider: AIProvider = PROVIDERS[config.providerId] || PROVIDERS[DEFAULT_PROVIDER_ID];
 
+    // Returns the correct API key for the currently selected provider
+    const activeApiKey: string | null =
+        config.providerId === 'anthropic' ? config.anthropicKey :
+        config.providerId === 'gemini' ? config.geminiKey :
+        config.apiKey;
+
     const trackUsage = (model: string, promptTokens: number, completionTokens: number) => {
         const PRICING: Record<string, { prompt: number, completion: number }> = {
+            // OpenAI
             'gpt-4o-mini': { prompt: 0.15 / 1000000, completion: 0.60 / 1000000 },
             'gpt-4o': { prompt: 2.50 / 1000000, completion: 10.00 / 1000000 },
             'gpt-3.5-turbo': { prompt: 0.50 / 1000000, completion: 1.50 / 1000000 },
-            'claude-3-5-sonnet-20240620': { prompt: 3.00 / 1000000, completion: 15.00 / 1000000 },
-            'claude-3-haiku-20240307': { prompt: 0.25 / 1000000, completion: 1.25 / 1000000 },
+            // Anthropic
+            'claude-sonnet-4-6': { prompt: 3.00 / 1000000, completion: 15.00 / 1000000 },
+            'claude-opus-4-6': { prompt: 15.00 / 1000000, completion: 75.00 / 1000000 },
+            'claude-haiku-4-5-20251001': { prompt: 0.80 / 1000000, completion: 4.00 / 1000000 },
+            // Gemini
             'gemini-1.5-pro': { prompt: 1.25 / 1000000, completion: 5.00 / 1000000 },
             'gemini-1.5-flash': { prompt: 0.075 / 1000000, completion: 0.30 / 1000000 }
         };
@@ -119,6 +133,7 @@ export function useAIProvider() {
         updateConfig,
         trackUsage,
         provider,
+        activeApiKey,
         isLoaded
     };
 }

@@ -11,6 +11,8 @@ export default function AISettings() {
 
     // Local state for the form so we don't save on every keystroke
     const [localKey, setLocalKey] = useState(config.apiKey || '');
+    const [localAnthropicKey, setLocalAnthropicKey] = useState(config.anthropicKey || '');
+    const [localGeminiKey, setLocalGeminiKey] = useState(config.geminiKey || '');
     const [localBudget, setLocalBudget] = useState(config.monthlyBudgetCap?.toString() || '');
     const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -24,9 +26,11 @@ export default function AISettings() {
     useEffect(() => {
         if (isLoaded) {
             setLocalKey(config.apiKey || '');
+            setLocalAnthropicKey(config.anthropicKey || '');
+            setLocalGeminiKey(config.geminiKey || '');
             setLocalBudget(config.monthlyBudgetCap?.toString() || '');
         }
-    }, [isLoaded, config.apiKey, config.monthlyBudgetCap]);
+    }, [isLoaded, config.apiKey, config.anthropicKey, config.geminiKey, config.monthlyBudgetCap]);
 
     if (!isLoaded) return null;
 
@@ -38,6 +42,8 @@ export default function AISettings() {
 
         updateConfig({
             apiKey: localKey.trim() || null,
+            anthropicKey: localAnthropicKey.trim() || null,
+            geminiKey: localGeminiKey.trim() || null,
             monthlyBudgetCap: parsedBudget
         });
 
@@ -82,8 +88,8 @@ export default function AISettings() {
                             className="settings-select"
                         >
                             {Object.values(PROVIDERS).map(p => (
-                                <option key={p.id} value={p.id} disabled={p.id !== 'openai'}>
-                                    {p.name} {p.id !== 'openai' ? '(Coming Soon)' : ''}
+                                <option key={p.id} value={p.id}>
+                                    {p.name}
                                 </option>
                             ))}
                         </select>
@@ -116,40 +122,78 @@ export default function AISettings() {
                         Your key is stored securely in your browser's local storage and is never sent to our servers.
                     </p>
 
-                    <div className="input-group">
-                        <Key size={18} className="input-icon-left" />
-                        <input
-                            type="password"
-                            placeholder="Enter your API key..."
-                            value={localKey}
-                            onChange={(e) => setLocalKey(e.target.value)}
-                            className="settings-input has-icon"
-                        />
-                    </div>
+                    {config.providerId === 'openai' && (
+                        <>
+                            <div className="input-group">
+                                <Key size={18} className="input-icon-left" />
+                                <input
+                                    type="password"
+                                    placeholder="Enter your OpenAI API key..."
+                                    value={localKey}
+                                    onChange={(e) => setLocalKey(e.target.value)}
+                                    className="settings-input has-icon"
+                                />
+                            </div>
+                            <div className="help-links">
+                                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="help-link">
+                                    <ExternalLink size={14} /> Get an OpenAI Key
+                                </a>
+                            </div>
+                            <div className="video-tutorial-container">
+                                <p className="video-tutorial-label">📽️ Watch: How to get your API key</p>
+                                <div className="video-embed-placeholder">
+                                    <iframe
+                                        src="https://www.youtube.com/embed/OB99E7Y1cMA?si=_9M-T9h14JLqg4Yp"
+                                        title="How to get your OpenAI API Key"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        style={{ width: '100%', aspectRatio: '16/9', borderRadius: '10px', border: 'none' }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
 
-                    <div className="help-links">
-                        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="help-link">
-                            <ExternalLink size={14} /> Get an OpenAI Key
-                        </a>
-                        <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer" className="help-link">
-                            <ExternalLink size={14} /> Get a Claude Key
-                        </a>
-                    </div>
+                    {config.providerId === 'anthropic' && (
+                        <>
+                            <div className="input-group">
+                                <Key size={18} className="input-icon-left" />
+                                <input
+                                    type="password"
+                                    placeholder="Enter your Anthropic API key..."
+                                    value={localAnthropicKey}
+                                    onChange={(e) => setLocalAnthropicKey(e.target.value)}
+                                    className="settings-input has-icon"
+                                />
+                            </div>
+                            <div className="help-links">
+                                <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer" className="help-link">
+                                    <ExternalLink size={14} /> Get an Anthropic Key
+                                </a>
+                            </div>
+                        </>
+                    )}
 
-                    {/* Video Tutorial Embed */}
-                    <div className="video-tutorial-container">
-                        <p className="video-tutorial-label">📽️ Watch: How to get your API key</p>
-                        <div className="video-embed-placeholder">
-                            <iframe
-                                src="https://www.youtube.com/embed/OB99E7Y1cMA?si=_9M-T9h14JLqg4Yp"
-                                title="How to get your OpenAI API Key"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                style={{ width: '100%', aspectRatio: '16/9', borderRadius: '10px', border: 'none' }}
-                            />
-                        </div>
-                    </div>
+                    {config.providerId === 'gemini' && (
+                        <>
+                            <div className="input-group">
+                                <Key size={18} className="input-icon-left" />
+                                <input
+                                    type="password"
+                                    placeholder="Enter your Google AI API key..."
+                                    value={localGeminiKey}
+                                    onChange={(e) => setLocalGeminiKey(e.target.value)}
+                                    className="settings-input has-icon"
+                                />
+                            </div>
+                            <div className="help-links">
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="help-link">
+                                    <ExternalLink size={14} /> Get a Gemini Key (Google AI Studio)
+                                </a>
+                            </div>
+                        </>
+                    )}
                 </section>
 
                 {/* Budget Guardrails */}
