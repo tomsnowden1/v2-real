@@ -15,7 +15,8 @@
       "Bash(wc -l /Users/jess/v2-real/src/**/*.tsx /Users/jess/v2-real/src/**/*.ts)",
       "Bash(npm run test:run)",
       "Bash(git add -A)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm install @anthropic-ai/sdk @google/generative-ai)"
     ]
   }
 }

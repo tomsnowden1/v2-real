@@ -87,13 +87,13 @@
 - [ ] Lazy-load OpenAI SDK — deferred (requires restructuring provider pattern)
 
 ### A6. Anthropic + Gemini Providers
-- [ ] Implement `AnthropicProvider` using `@anthropic-ai/sdk` (add to `useAIProvider` provider list)
-- [ ] Implement `GeminiProvider` using `@google/generative-ai` SDK
-- [ ] Update `AISettings.tsx` to show radio buttons for provider selection (OpenAI, Anthropic, Gemini)
-- [ ] Add provider keys to localStorage + AISettings (similar to existing OpenAI)
-- [ ] Ensure all coach prompts route through the selected provider
-- [ ] Test each provider's message formatting and error handling
-- [ ] Build verified, no TypeScript errors
+- [x] Implement `AnthropicProvider` using `@anthropic-ai/sdk` (add to `useAIProvider` provider list)
+- [x] Implement `GeminiProvider` using `@google/generative-ai` SDK
+- [x] Update `AISettings.tsx` to show radio buttons for provider selection (OpenAI, Anthropic, Gemini)
+- [x] Add provider keys to localStorage + AISettings (similar to existing OpenAI)
+- [x] Ensure all coach prompts route through the selected provider
+- [x] Test each provider's message formatting and error handling
+- [x] Build verified, no TypeScript errors
 
 ### A7. Export / Import Workout Data
 - [ ] Create export modal: JSON (full history) + CSV (simple spreadsheet)
@@ -544,6 +544,17 @@
   - User sees clear recovery path instead of technical stack traces
   - Build verified: no TypeScript errors
   - All 91 tests pass
+
+### 2026-03-07 (continued, A6)
+- **A6 Complete**: Anthropic + Gemini Providers
+  - Installed `@anthropic-ai/sdk` (v0.78.0) and `@google/generative-ai` (v0.24.1)
+  - Implemented full `AnthropicProvider` in `alternativeProviders.ts`: all 3 methods using Anthropic Messages API (system prompt as separate param, `dangerouslyAllowBrowser: true` for BYOK)
+  - Implemented full `GeminiProvider`: all 3 methods using `startChat()` for conversation history, `responseMimeType: 'application/json'` for JSON methods
+  - Added `anthropicKey` + `geminiKey` to `AIConfig` in `useAIProvider.ts`; added `activeApiKey` helper that returns the right key per provider
+  - Updated model IDs: Claude Sonnet 4.6 / Opus 4.6 / Haiku 4.5, Gemini 1.5 Pro / Flash
+  - Updated pricing table for new Anthropic models
+  - `AISettings.tsx`: all 3 providers enabled (no more "Coming Soon"), per-provider key input + help link shown conditionally
+  - Build verified: no TypeScript errors, 91/91 tests pass
 
 - **UX2 Complete**: Add "Fill From Last Session" to Workout Logger
   - Added `handleFillFromLastSession()` function to WorkoutLogger.tsx
