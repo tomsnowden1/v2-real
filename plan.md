@@ -132,11 +132,12 @@
 > Found during full audit on 2026-03-07. Do these first — high impact, low effort.
 
 ### QW1. Add Loading State to "Finish & Save" Button
-- [ ] Add `isFinishing` state to `WorkoutLogger.tsx`
-- [ ] Disable the "Finish & Save" button and show "Saving..." text while async `handleFinish` runs
-- [ ] Prevents double-taps and "did it save?" anxiety
+- [x] Add `isFinishing` state to `WorkoutLogger.tsx`
+- [x] Disable the "Finish & Save" button and show "Saving..." text while async `handleFinish` runs
+- [x] Prevents double-taps and "did it save?" anxiety
 - **Files:** `FinishWorkoutSheet.tsx`, `WorkoutLogger.tsx`
 - **Effort:** 1-2 hours
+- **Completed:** 2026-03-07
 
 ### QW2. Add Progress Dots to Onboarding Wizard
 - [ ] Calculate total steps in `ArchitectIntakeWizard.tsx` (accounting for beginner/recovery skip logic)
@@ -406,3 +407,11 @@
   - Top priorities: finishWorkout transaction safety (TS1), API proxy hardening (TS3), onboarding progress dots (QW2)
   - Existing completed work preserved — all D1-D5 and A1-A5 tasks untouched
   - 4-week implementation order added to plan.md
+
+- **QW1 Complete**: Add Loading State to "Finish & Save" Button
+  - Added `isFinishing` state to `WorkoutLogger.tsx` that wraps the async `handleFinish` call
+  - "Finish & Save" button now shows "Saving..." text and disables while save is in progress
+  - Cancel button also disabled to prevent accidental cancels while saving
+  - Prevents double-taps and provides visual feedback during the save operation
+  - Build verified: no TypeScript errors
+  - All 91 tests pass (including 70 from previous work)

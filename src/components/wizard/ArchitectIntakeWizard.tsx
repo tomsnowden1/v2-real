@@ -234,6 +234,37 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
     const nextAfterStep6 = showRecoveryDetail ? 7 : 8;
     const prevStep7Or8 = showRecoveryDetail ? 7 : 8;
 
+    // Calculate total visible steps (accounting for skips)
+    const getTotalVisibleSteps = (): number => {
+        let count = 8; // Base: steps 1,2,3,4,6,8,9 (excluding 5 and 7)
+        if (!isBeginner) count++; // Add step 5 if not beginner
+        if (showRecoveryDetail) count++; // Add step 7 if Strength/Hypertrophy
+        return count;
+    };
+
+    // Generate dots array where current step is marked as true
+    const generateDots = (): boolean[] => {
+        const totalSteps = getTotalVisibleSteps();
+        const dots = new Array(totalSteps).fill(false);
+
+        // Map actual step numbers to visible step indices
+        let visibleIndex = 0;
+        const visibleStepNumbers = [1, 2, 3, 4];
+        if (!isBeginner) visibleStepNumbers.push(5);
+        visibleStepNumbers.push(6);
+        if (showRecoveryDetail) visibleStepNumbers.push(7);
+        visibleStepNumbers.push(8, 9);
+
+        if (visibleStepNumbers.includes(step)) {
+            visibleIndex = visibleStepNumbers.indexOf(step);
+            dots[visibleIndex] = true;
+        }
+
+        return dots;
+    };
+
+    const dots = generateDots();
+
     // ── STEP 10: LOADING ──────────────────────────────────────────────────────
     if (step === 10) {
         return (
@@ -264,6 +295,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
             <WizardShell
                 title="Your Mission"
                 subtitle="The Coach builds your entire program around this. Choose what you are actually training for right now."
+                dots={dots}
             >
                 <OptionCardGrid
                     options={GOALS.map(g => ({ ...g, id: g.id! }))}
@@ -284,6 +316,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(1)}
                 title="Why does this matter?"
                 subtitle="This is the most important question. Your Coach will use this to challenge you when things get hard."
+                dots={dots}
             >
                 <div className="preferences-container preferences-container-flex">
                     <textarea
@@ -321,6 +354,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(2)}
                 title="How active are you outside the gym?"
                 subtitle="This helps the Coach calibrate your starting volume — not just your workout frequency."
+                dots={dots}
             >
                 <OptionCardGrid
                     options={ACTIVITY_LEVELS}
@@ -346,6 +380,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(3)}
                 title="Time & Schedule"
                 subtitle="Be realistic. A plan you can keep beats a perfect plan you can't."
+                dots={dots}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div>
@@ -389,6 +424,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(4)}
                 title="What kind of training do you enjoy?"
                 subtitle="Your Coach will lean into what you already like and avoid what you hate."
+                dots={dots}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div>
@@ -423,6 +459,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(prevStep5)}
                 title="What usually makes you skip?"
                 subtitle="Your Coach will design around your real life — not an imaginary version of it."
+                dots={dots}
             >
                 <div>
                     <ChipGroup
@@ -451,6 +488,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(6)}
                 title="Recovery check"
                 subtitle="Recovery is half the work. A quick picture helps the Coach set safe volume."
+                dots={dots}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div>
@@ -509,6 +547,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 onBack={() => setStep(prevStep7Or8)}
                 title="Your Training Space"
                 subtitle="The Coach will only assign exercises you can actually do."
+                dots={dots}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
                     {gymName ? (
@@ -558,6 +597,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
             onBack={() => setStep(8)}
             title="Your Program"
             subtitle="Here is what the next 6 weeks look like."
+            dots={dots}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Summary card */}
