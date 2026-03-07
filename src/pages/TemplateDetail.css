@@ -1,0 +1,124 @@
+/* ── Template Detail Page ────────────────────────────────────────────────── */
+.template-detail-page {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.template-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.template-detail-header-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.template-detail-back-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-main);
+    cursor: pointer;
+    padding: 8px;
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.15s ease;
+}
+
+.template-detail-back-btn:hover {
+    opacity: 0.7;
+}
+
+.template-detail-name-input {
+    font-size: 20px;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: var(--color-text-main);
+    outline: none;
+    width: 100%;
+    margin-left: 8px;
+}
+
+.template-detail-name-input:focus {
+    outline: none;
+}
+
+.template-detail-start-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-primary-light, rgba(59, 130, 246, 0.1));
+    color: var(--color-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.15s ease;
+}
+
+.template-detail-start-btn:hover {
+    background: var(--color-primary-light, rgba(59, 130, 246, 0.15));
+}
+
+.template-detail-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.template-detail-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+}
+
+.template-detail-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--color-surface);
+    color: var(--color-text-main);
+    border: 1px dashed var(--color-border);
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.15s ease;
+}
+
+.template-detail-add-btn:hover {
+    background: var(--color-border);
+}
+
+.template-detail-delete-section {
+    margin-top: 40px;
+}
+
+.template-detail-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    width: 100%;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.template-detail-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+}

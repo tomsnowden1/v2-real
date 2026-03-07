@@ -313,16 +313,16 @@ export default function WorkoutLogger() {
                     onClick={() => { setShowReadinessPulse(false); setReadinessDone(true); }}
                 >
                     <div
-                        style={{ backgroundColor: 'var(--color-surface)', borderRadius: '20px 20px 0 0', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}
+                        className="readiness-pulse-sheet"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div>
-                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--color-text-main)' }}>How are you feeling today?</h3>
-                            <p style={{ margin: '6px 0 0 0', fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                        <div className="readiness-pulse-header">
+                            <h3>How are you feeling today?</h3>
+                            <p>
                                 Your Coach will adjust today's target weights based on your energy.
                             </p>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                        <div className="readiness-pulse-buttons">
                             {[
                                 { level: 1, emoji: '😴', label: 'Exhausted' },
                                 { level: 2, emoji: '😕', label: 'Low' },
@@ -333,21 +333,16 @@ export default function WorkoutLogger() {
                                 <button
                                     key={level}
                                     onClick={() => handleReadiness(level)}
-                                    style={{
-                                        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                        gap: '4px', padding: '12px 4px', borderRadius: '12px',
-                                        border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)',
-                                        cursor: 'pointer', transition: 'all 0.15s ease',
-                                    }}
+                                    className="readiness-pulse-btn"
                                 >
-                                    <span style={{ fontSize: '24px' }}>{emoji}</span>
-                                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', textAlign: 'center' }}>{label}</span>
+                                    <span className="readiness-pulse-emoji">{emoji}</span>
+                                    <span className="readiness-pulse-label">{label}</span>
                                 </button>
                             ))}
                         </div>
                         <button
                             onClick={() => { setShowReadinessPulse(false); setReadinessDone(true); }}
-                            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '14px', cursor: 'pointer', padding: '4px' }}
+                            className="readiness-pulse-skip"
                         >
                             Skip — use default weights
                         </button>

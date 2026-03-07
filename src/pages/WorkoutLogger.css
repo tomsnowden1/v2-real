@@ -398,6 +398,76 @@
     backdrop-filter: blur(4px);
 }
 
+.readiness-pulse-sheet {
+    background-color: var(--color-surface);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.readiness-pulse-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.readiness-pulse-header p {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.readiness-pulse-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.readiness-pulse-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 4px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.readiness-pulse-btn:hover {
+    background-color: var(--color-border);
+}
+
+.readiness-pulse-emoji {
+    font-size: 24px;
+}
+
+.readiness-pulse-label {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.readiness-pulse-skip {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.15s ease;
+}
+
+.readiness-pulse-skip:hover {
+    color: var(--color-text-main);
+}
+
 /* ── Error Toast ──────────────────────────────────────────────── */
 .workout-logger-error-toast {
     position: fixed;

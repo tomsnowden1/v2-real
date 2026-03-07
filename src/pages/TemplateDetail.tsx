@@ -10,6 +10,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { deleteTemplate } from '../db/templateService';
 import { findOrCreateExerciseByName } from '../db/exerciseService';
 import { generateId } from '../lib/id';
+import './TemplateDetail.css';
 
 export default function TemplateDetail() {
     const { id } = useParams<{ id: string }>();
@@ -34,11 +35,11 @@ export default function TemplateDetail() {
     }, [template, name]);
 
     if (template === undefined) {
-        return <div className="page-content" style={{ padding: 20 }}>Loading...</div>;
+        return <div className="page-content template-detail-page">Loading...</div>;
     }
 
     if (template === null) {
-        return <div className="page-content" style={{ padding: 20 }}>Template not found</div>;
+        return <div className="page-content template-detail-page">Template not found</div>;
     }
 
     // Save changes to db
@@ -136,12 +137,12 @@ export default function TemplateDetail() {
     };
 
     return (
-        <div className="page-content" style={{ padding: '16px', paddingBottom: '100px' }}>
-            <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+        <div className="page-content template-detail-page">
+            <header className="template-detail-header">
+                <div className="template-detail-header-left">
                     <button
                         onClick={() => navigate(-1)}
-                        style={{ background: 'none', border: 'none', color: 'var(--color-text-main)', cursor: 'pointer', padding: '8px', marginLeft: '-8px', display: 'flex', alignItems: 'center' }}
+                        className="template-detail-back-btn"
                     >
                         <ChevronLeft size={24} />
                     </button>
@@ -150,42 +151,21 @@ export default function TemplateDetail() {
                         value={name}
                         onChange={handleNameChange}
                         onBlur={handleNameBlur}
-                        style={{
-                            fontSize: '20px',
-                            fontWeight: 700,
-                            border: 'none',
-                            background: 'transparent',
-                            color: 'var(--color-text-main)',
-                            outline: 'none',
-                            width: '100%',
-                            marginLeft: '8px'
-                        }}
+                        className="template-detail-name-input"
                     />
                 </div>
                 <button
                     onClick={handleStartWorkout}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: 'var(--color-primary-light, rgba(59, 130, 246, 0.1))',
-                        color: 'var(--color-primary)',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        cursor: 'pointer',
-                        fontWeight: 600,
-                        fontSize: '14px'
-                    }}
+                    className="template-detail-start-btn"
                 >
                     <Play size={16} fill="currentColor" />
                     Start
                 </button>
             </header>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="template-detail-exercises">
                 {template.exercises.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--color-text-muted)' }}>
+                    <div className="template-detail-empty">
                         No exercises in this template.
                     </div>
                 ) : (
@@ -221,43 +201,17 @@ export default function TemplateDetail() {
 
                 <button
                     onClick={() => openReplaceModal(null)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '16px',
-                        background: 'var(--color-surface)',
-                        color: 'var(--color-text-main)',
-                        border: '1px dashed var(--color-border)',
-                        borderRadius: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginTop: '8px'
-                    }}
+                    className="template-detail-add-btn"
                 >
                     <Plus size={20} />
                     Add Exercise
                 </button>
             </div>
 
-            <div style={{ marginTop: '40px' }}>
+            <div className="template-detail-delete-section">
                 <button
                     onClick={() => setIsDeleteModalOpen(true)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '16px',
-                        width: '100%',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        color: '#ef4444',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        borderRadius: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                    }}
+                    className="template-detail-delete-btn"
                 >
                     <Trash2 size={20} />
                     Delete Template

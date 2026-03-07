@@ -189,12 +189,13 @@
 - **Completed:** 2026-03-07
 
 ### TS2. Add "Soft Cancel" Recovery for Workouts
-- [ ] When canceling a workout, save it to a `recentlyCanceled` slot in localStorage (TTL: 10 min)
-- [ ] Show a "Resume last canceled workout" option on the WorkoutLogger empty state
-- [ ] After 10 minutes, the slot auto-expires
+- [x] When canceling a workout, save it to a `recentlyCanceled` slot in localStorage (TTL: 10 min)
+- [x] Show a "Resume last canceled workout" option on the WorkoutLogger empty state
+- [x] After 10 minutes, the slot auto-expires
 - **Why:** Cancel is instant and irreversible. Accidental cancels lose all workout data.
-- **Files:** `src/context/WorkoutContext.tsx`, `src/pages/WorkoutLogger.tsx`
+- **Files:** `src/context/WorkoutContext.tsx`, `src/pages/WorkoutLogger.tsx`, `src/pages/WorkoutLogger.css`
 - **Effort:** 3-5 hours
+- **Completed:** 2026-03-07
 
 ### TS3. Harden the API Proxy
 - [ ] Add model whitelist: only allow specific models (e.g., gpt-4o-mini, gpt-4o)
@@ -460,7 +461,38 @@
   - Build verified: no TypeScript errors
   - All 91 tests pass
 
-### 2026-03-07 (continued)
+### 2026-03-07 (continued, TS3)
+- **TS3 Complete**: Harden the API Proxy
+  - Added origin validation (localhost + vercel.app domains)
+  - Added model whitelist (gpt-4o-mini, gpt-4o only)
+  - Added token cap (max 4000)
+  - Added messages validation (non-empty array required)
+  - Added field sanitization (only safe fields forwarded to OpenAI)
+  - Prevents abuse of proxy URL that's in JS bundle
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+### 2026-03-07 (continued, UX1)
+- **UX1 Complete**: Add "Repeat This Workout" to Workout Detail
+  - Added `handleRepeat()` function to WorkoutDetail.tsx that clones exercises
+  - Copies exercises with fresh IDs and resets isDone/weight flags
+  - Added "Repeat This Workout" button with Play icon before Delete button
+  - Added .wd-repeat-btn styling (green outline button)
+  - Shows warning if user has active workout, offers to replace
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+### 2026-03-07 (continued, TS4)
+- **TS4 Complete**: Validate AI Response JSON Before Rendering
+  - Added `validatePostWorkoutReview()` runtime type guard to types.ts
+  - Checks all required fields: reviewSummary, wins, issues, prHighlights, weekProgress (with nested numbers), goalProgress, takeawaysTTL, takeawaysDurableCandidates
+  - Updated ReviewCard.tsx to use validation instead of `as PostWorkoutReview` assertion
+  - Two error states: "Review incomplete" and "Review could not be loaded" (both with Retry button)
+  - Prevents silent rendering failures when AI returns malformed JSON
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+### 2026-03-07 (continued, TS2)
 - **TS1 Complete**: Wrap `finishWorkout` in a Dexie Transaction
   - Modified `finishWorkout()` in WorkoutContext.tsx to return `Promise<{ success: boolean; error?: string }>`
   - Wrapped all 3 DB operations in `db.transaction('rw', db.workoutHistory, db.weeklyPlans, db.prs, async () => {...})`
@@ -478,3 +510,14 @@
   - Build verified: resolved 7 TypeScript errors in type definitions
   - All 91 tests pass
   - Prevents data corruption from partial failures (workout saved but weekly plan/PRs skipped)
+
+- **TS2 Complete**: Add "Soft Cancel" Recovery for Workouts
+  - Added `getRecentlyCanceledWorkout()` helper to check localStorage for recently canceled workout (< 10 min old)
+  - Added `clearRecentlyCanceledWorkout()` helper to clean up expired saves
+  - Added `resumeRecentlyCanceledWorkout()` method to WorkoutContext
+  - Modified `cancelWorkout()` to save current state (name, exercises, weights, startTime) before clearing
+  - Updated WorkoutLogger.tsx to check for recently canceled workout on mount, show resume button if available
+  - Added .resume-workout-btn styling (green outline button with Play icon, appears above primary button)
+  - Auto-expires after 10 minutes to avoid clutter while preventing accidental data loss
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
