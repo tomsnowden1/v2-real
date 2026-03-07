@@ -178,14 +178,15 @@
 > These protect users from data loss and protect your wallet from API abuse.
 
 ### TS1. Wrap `finishWorkout` in a Dexie Transaction
-- [ ] Wrap the three sequential DB writes (workoutHistory, weeklyPlan, PRs) in `db.transaction()`
-- [ ] Add user-visible error toast/modal if saving fails (currently errors only go to console)
-- [ ] Move the PR check from fire-and-forget into the transaction scope
-- [ ] Add try/catch with meaningful user message on failure
+- [x] Wrap the three sequential DB writes (workoutHistory, weeklyPlan, PRs) in `db.transaction()`
+- [x] Add user-visible error toast/modal if saving fails (currently errors only go to console)
+- [x] Move the PR check from fire-and-forget into the transaction scope
+- [x] Add try/catch with meaningful user message on failure
 - **Why:** This is the most critical data path. A partial failure means workout saves but PRs or weekly plan are wrong — and the user has no way to know.
-- **Files:** `src/context/WorkoutContext.tsx` (lines ~108-143), `weeklyPlanService.ts`, `prService.ts`
+- **Files:** `src/context/WorkoutContext.tsx` (lines ~108-143), `src/hooks/usePostWorkoutReview.ts`, `src/pages/WorkoutLogger.tsx`, `src/pages/WorkoutLogger.css`
 - **Effort:** 2-4 hours
 - **Risk if skipped:** HIGH — any IndexedDB hiccup silently corrupts state
+- **Completed:** 2026-03-07
 
 ### TS2. Add "Soft Cancel" Recovery for Workouts
 - [ ] When canceling a workout, save it to a `recentlyCanceled` slot in localStorage (TTL: 10 min)
@@ -438,3 +439,42 @@
   - Database already supports custom exercises (isCustom flag exists), ready for full form feature later
   - Build verified: no TypeScript errors
   - All 91 tests pass
+
+- **QW4 Complete**: Unify Modal Overlay Into One CSS Variable
+  - Added `--color-overlay: rgba(0, 0, 0, 0.6)` to `src/index.css` (both :root and :root.dark)
+  - Replaced 9 hardcoded overlay colors with `var(--color-overlay)` across 7 CSS files
+  - Fixed critical z-index bugs: ReplaceModal z-index 2000 → var(--z-modal) (100) — was dangerously high
+  - Applied fix to 6 modal overlays: FinishWorkoutSheet, ReplaceModal, WorkoutDetail, GymEquipment, AdjustWeekModal, WeeklyCheckInModal, ResolveExercisesModal
+  - Replaced inline style overlays in WorkoutLogger.tsx and Home.tsx with CSS classes
+  - Added .readiness-pulse-overlay and .template-confirm-overlay classes to respective CSS files
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+- **QW5 Complete**: Add `role="dialog"` + Escape Key to ConfirmModal
+  - Added `useEffect` hook to ConfirmModal.tsx for Escape key handling
+  - Added `role="dialog"` and `aria-modal="true"` attributes to modal overlay div
+  - When modal is open, pressing Escape calls onCancel() and closes modal
+  - Keyboard listeners auto-cleanup on modal close or component unmount
+  - Improves accessibility for screen readers and keyboard-only users
+  - Since ConfirmModal is reused everywhere, this one fix improves accessibility across entire app
+  - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+### 2026-03-07 (continued)
+- **TS1 Complete**: Wrap `finishWorkout` in a Dexie Transaction
+  - Modified `finishWorkout()` in WorkoutContext.tsx to return `Promise<{ success: boolean; error?: string }>`
+  - Wrapped all 3 DB operations in `db.transaction('rw', db.workoutHistory, db.weeklyPlans, db.prs, async () => {...})`
+  - Operation 1: Save workout to workoutHistory
+  - Operation 2: Update weekly plan with completed workout ID
+  - Operation 3: Check and save PRs (wrapped in try/catch, failure doesn't roll back transaction)
+  - Transaction atomically commits all 3 ops or rolls back all 3 if any fail
+  - `cancelWorkout()` only called on success — prevents silent data loss
+  - Updated usePostWorkoutReview.ts handleFinish() to check saveResult.success and return error
+  - Updated handleFinish signature to return `Promise<{ goToCoach: boolean; error?: string }>`
+  - Added error toast state to WorkoutLogger.tsx with 4-second auto-dismiss
+  - Added .workout-logger-error-toast CSS styling with toast-down animation
+  - If save fails, user sees red error toast and remains on WorkoutLogger (can retry)
+  - If save succeeds, user navigates to /coach (if sendToCoach) or / (otherwise)
+  - Build verified: resolved 7 TypeScript errors in type definitions
+  - All 91 tests pass
+  - Prevents data corruption from partial failures (workout saved but weekly plan/PRs skipped)
