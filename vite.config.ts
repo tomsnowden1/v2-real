@@ -39,6 +39,9 @@ export default defineConfig({
             },
 
             workbox: {
+                // Automatically delete cached files from old deployments
+                cleanupOutdatedCaches: true,
+
                 // Precache all built static assets
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp}'],
 
