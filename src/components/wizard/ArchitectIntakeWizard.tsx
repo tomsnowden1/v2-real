@@ -64,7 +64,7 @@ type StressLevel = typeof STRESS_OPTIONS[number];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type ArchitectStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ArchitectStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 interface Props {
     profile: UserProfile;
@@ -135,6 +135,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
     const [selectedBlockers, setSelectedBlockers] = useState<string[]>([]);
     const [selectedSleepHours, setSelectedSleepHours] = useState<SleepHours | null>(null);
     const [selectedStressLevel, setSelectedStressLevel] = useState<StressLevel | null>(null);
+    const [personalContext, setPersonalContext] = useState('');
     const [gymName, setGymName] = useState<string | null>(null);
     const [gymEquipmentCount, setGymEquipmentCount] = useState<number>(0);
     const [isSaving, setIsSaving] = useState(false);
@@ -168,7 +169,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
     const handleCommit = async () => {
         if (isSaving) return;
         setIsSaving(true);
-        setStep(10);
+        setStep(11);
 
         try {
             const days = parseInt(selectedDays, 10);
@@ -192,6 +193,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                 sleepHours: selectedSleepHours ?? undefined,
                 stressLevel: selectedStressLevel ?? undefined,
                 onboardingComplete: true,
+                personalContext: personalContext.trim().slice(0, 300) || undefined,
             };
 
             // Run orchestrator first while the wizard loading screen is visible.
@@ -236,7 +238,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
 
     // Calculate total visible steps (accounting for skips)
     const getTotalVisibleSteps = (): number => {
-        let count = 8; // Base: steps 1,2,3,4,6,8,9 (excluding 5 and 7)
+        let count = 9; // Base: steps 1,2,3,4,6,8,9,10 (excluding 5 and 7) — step 9=personal context, step 10=manifesto
         if (!isBeginner) count++; // Add step 5 if not beginner
         if (showRecoveryDetail) count++; // Add step 7 if Strength/Hypertrophy
         return count;
@@ -253,7 +255,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
         if (!isBeginner) visibleStepNumbers.push(5);
         visibleStepNumbers.push(6);
         if (showRecoveryDetail) visibleStepNumbers.push(7);
-        visibleStepNumbers.push(8, 9);
+        visibleStepNumbers.push(8, 9, 10);
 
         if (visibleStepNumbers.includes(step)) {
             visibleIndex = visibleStepNumbers.indexOf(step);
@@ -265,8 +267,8 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
 
     const dots = generateDots();
 
-    // ── STEP 10: LOADING ──────────────────────────────────────────────────────
-    if (step === 10) {
+    // ── STEP 11: LOADING ──────────────────────────────────────────────────────
+    if (step === 11) {
         return (
             <WizardShell title="Building your program..." subtitle="Coach is setting up your first week. This usually takes 5–10 seconds.">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', paddingTop: '32px' }}>
@@ -591,10 +593,43 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
         );
     }
 
-    // ── STEP 9: MANIFESTO + COMMIT ────────────────────────────────────────────
+    // ── STEP 9: PERSONAL CONTEXT ──────────────────────────────────────────────
+    if (step === 9) {
+        return (
+            <WizardShell
+                onBack={() => setStep(8)}
+                title="Anything else?"
+                subtitle="Optional — but the more your Coach knows, the smarter your first week will be."
+                dots={dots}
+            >
+                <div className="preferences-container preferences-container-flex">
+                    <textarea
+                        value={personalContext}
+                        onChange={(e) => setPersonalContext(e.target.value.slice(0, 300))}
+                        placeholder="e.g. bad lower back, travel 2 weeks a month, can't do overhead pressing, hate cardio, recovering from shoulder surgery..."
+                        className="textarea-styled"
+                        style={{ minHeight: '100px' }}
+                        maxLength={300}
+                    />
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: '6px 0 0 0', lineHeight: 1.5 }}>
+                        {personalContext.length}/300 characters — injuries, limitations, travel habits, dislikes. Your Coach treats this as hard constraints.
+                    </p>
+                </div>
+                <button
+                    className="goal-save-btn button-margin-top-large"
+                    onClick={() => setStep(10)}
+                >
+                    {personalContext.trim() ? 'Continue' : 'Skip'}
+                </button>
+            </WizardShell>
+        );
+    }
+
+    // ── STEP 10: MANIFESTO + COMMIT ───────────────────────────────────────────
+    if (step === 10) {
     return (
         <WizardShell
-            onBack={() => setStep(8)}
+            onBack={() => setStep(9)}
             title="Your Program"
             subtitle="Here is what the next 6 weeks look like."
             dots={dots}
@@ -617,6 +652,7 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
                         { label: 'Activity Level', value: selectedActivityLevel ?? '—' },
                         selectedTrainingStyles.length > 0 ? { label: 'Preferences', value: selectedTrainingStyles.filter(s => s !== 'No strong preference').join(', ') || 'None specified' } : null,
                         selectedBlockers.filter(b => b !== 'I rarely skip').length > 0 ? { label: 'Blockers noted', value: selectedBlockers.filter(b => b !== 'I rarely skip').join(', ') } : null,
+                        personalContext.trim() ? { label: 'Coach notes', value: personalContext.trim() } : null,
                     ].filter(Boolean).map((row, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                             <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>{row!.label}</span>
@@ -673,4 +709,6 @@ export default function ArchitectIntakeWizard({ profile }: Props) {
             </button>
         </WizardShell>
     );
+    }
+    return null;
 }

@@ -225,6 +225,10 @@ function buildWeeklyPlanPrompt(
                 ? '12-20 reps at moderate load'
                 : '8-12 reps (beginner/consistency focus)';
 
+    const personalContextStr = profile.personalContext?.trim()
+        ? `\nSAFETY CONSTRAINTS — USER-REPORTED (treat as hard constraints; NEVER assign exercises that stress these areas):\n${profile.personalContext.trim().slice(0, 300)}\n`
+        : '';
+
     return `You are the IronAI Coach, an expert strength and conditioning AI.
 The user is checking in to plan their workouts for the new week.
 Generate ${answers.daysAvailable} distinct workout templates for them to complete this week.
@@ -233,10 +237,24 @@ User Goal: ${profile.goal} (target rep range: ${goalRepRange})
 Experience Level: ${profile.experienceLevel || 'Intermediate'}
 Coach Persona: ${profile.coachPersona || 'Supportive'}
 User Constraints/Injuries: ${profile.preferences || 'None specified.'}
-Available Equipment: ${equipmentContext}
+${personalContextStr}Available Equipment: ${equipmentContext}
 User's Weight Unit: ${unit} — YOU MUST return all targetWeight values in ${unit}. Do NOT mix units.
 
 ${weightBaselineStr ? `STRENGTH BASELINES:\n${weightBaselineStr}\n` : ''}
+WORKOUT STRUCTURE REQUIREMENT (apply to EVERY workout):
+Every workout MUST contain at minimum 4 exercises structured as:
+1. One main compound lift (primary mover for the session focus)
+2. One primary accessory (same muscle group as the main lift)
+3. One secondary accessory (supporting or antagonist muscle group)
+4. One bodyweight or finisher movement (core, conditioning, or functional — ALWAYS include this slot)
+NEVER generate a workout with fewer than 4 exercises.
+
+EQUIPMENT FALLBACK RULE: If equipment for the ideal exercise is unavailable, substitute in this order:
+- No barbell → use dumbbells or kettlebells
+- No dumbbells → use resistance bands or bodyweight
+- Slot 4 (finisher) MUST ALWAYS be a bodyweight movement regardless of gym type:
+  examples: push-ups, plank variations, mountain climbers, jumping jacks, bodyweight squats, core work
+
 USER'S CHECK-IN ANSWERS:
 - Days I can train this week: ${answers.daysAvailable}
 - Body Status / Soreness: "${answers.bodyStatus}"
@@ -257,11 +275,49 @@ Do NOT include targetWeight/targetReps for warm-ups, cardio, or bodyweight-only 
     {
       "name": "Push Day (Chest, Shoulders, Triceps)",
       "exercises": [
-        { "name": "Barbell Bench Press", "sets": 3, "reps": "${profile.goal === 'Strength' ? '5' : '10'}", "weight": "${profile.goal === 'Strength' ? '135 lbs' : '95 lbs'}", "targetWeight": ${profile.goal === 'Strength' ? 135 : 95}, "targetReps": ${profile.goal === 'Strength' ? 5 : 10}, "notes": "Control the eccentric" }
+        { "name": "Barbell Bench Press", "sets": 3, "reps": "${profile.goal === 'Strength' ? '5' : '10'}", "weight": "${profile.goal === 'Strength' ? '135 lbs' : '95 lbs'}", "targetWeight": ${profile.goal === 'Strength' ? 135 : 95}, "targetReps": ${profile.goal === 'Strength' ? 5 : 10}, "notes": "Control the eccentric" },
+        { "name": "Incline Dumbbell Press", "sets": 3, "reps": "10", "weight": "50 lbs", "targetWeight": 50, "targetReps": 10 },
+        { "name": "Lateral Raise", "sets": 3, "reps": "15", "weight": "15 lbs", "targetWeight": 15, "targetReps": 15 },
+        { "name": "Push-ups", "sets": 2, "reps": "15", "weight": "bodyweight", "notes": "Finisher — go to near failure" }
       ]
     }
   ]
 }`;
+}
+
+function buildCompressionPrompt(workouts: WorkoutHistory[], profile: UserProfile): string {
+    const unit = profile.weightUnit ?? 'lbs';
+    const workoutLines = workouts.map(w => {
+        const date = new Date(w.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        const exLines = w.exercises.map(ex => {
+            const name = ex.exerciseName || ex.exerciseId;
+            const doneSets = ex.sets.filter(s => s.isDone);
+            const totalVol = doneSets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+            const topWeight = Math.max(...doneSets.map(s => s.weight), 0);
+            const topReps = doneSets.length > 0 ? doneSets[0].reps : 0;
+            const e1rm = topWeight > 0 && topReps > 0 ? (topWeight * (1 + topReps / 30)).toFixed(1) : '0';
+            return `${name}: ${doneSets.length} sets, top ${topWeight}${unit}x${topReps}, e1RM~${e1rm}, vol ${totalVol.toFixed(0)}`;
+        }).join('; ');
+        return `${w.name} (${date}): ${exLines}`;
+    }).join('\n');
+
+    return `You are a data compressor. Convert the provided workout data into a single line of metadata under 30 words.
+Format EXACTLY like this example:
+[Sets: 48] | [E1RM Trends: SQ(+5${unit}), BP(-2${unit})] | [Missed: Legs] | [Fatigue: Med]
+
+Rules:
+- Count total completed sets across all workouts
+- Note significant e1RM trends (up/down) for main lifts only
+- Note any body parts that were planned but missed
+- Estimate fatigue as Low/Med/High based on volume and performance
+- Output ONLY the metadata line — no explanation, no conversation
+- User's goal: ${profile.goal}
+- Weight unit: ${unit}
+
+WORKOUT DATA:
+${workoutLines}
+
+Respond with valid JSON: { "summary": "your single-line metadata here" }`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -349,6 +405,39 @@ export const anthropicProvider: AIProvider = {
             };
         } catch (error) {
             console.error('Anthropic Provider Review Error:', error);
+            return { data: null };
+        }
+    },
+
+    async generateWeeklyCompression(
+        apiKey: string,
+        model: string,
+        workouts: WorkoutHistory[],
+        profile: UserProfile
+    ): Promise<AIResponse<string>> {
+        try {
+            const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+            const prompt = buildCompressionPrompt(workouts, profile);
+
+            const response = await client.messages.create({
+                model: model || 'claude-sonnet-4-6',
+                max_tokens: 200,
+                messages: [{ role: 'user', content: prompt }],
+            });
+
+            const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
+            if (!text) return { data: null };
+
+            const parsed = JSON.parse(text);
+            return {
+                data: parsed.summary || null,
+                usage: {
+                    promptTokens: response.usage.input_tokens,
+                    completionTokens: response.usage.output_tokens,
+                },
+            };
+        } catch (error) {
+            console.error('Anthropic Provider Compression Error:', error);
             return { data: null };
         }
     },
@@ -467,6 +556,33 @@ export const geminiProvider: AIProvider = {
             return { data: parsed };
         } catch (error) {
             console.error('Gemini Provider Review Error:', error);
+            return { data: null };
+        }
+    },
+
+    async generateWeeklyCompression(
+        apiKey: string,
+        model: string,
+        workouts: WorkoutHistory[],
+        profile: UserProfile
+    ): Promise<AIResponse<string>> {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const prompt = buildCompressionPrompt(workouts, profile);
+
+            const geminiModel = genAI.getGenerativeModel({
+                model: model || 'gemini-1.5-flash',
+                generationConfig: { responseMimeType: 'application/json' },
+            });
+
+            const result = await geminiModel.generateContent(prompt);
+            const text = result.response.text();
+            if (!text) return { data: null };
+
+            const parsed = JSON.parse(text);
+            return { data: parsed.summary || null };
+        } catch (error) {
+            console.error('Gemini Provider Compression Error:', error);
             return { data: null };
         }
     },

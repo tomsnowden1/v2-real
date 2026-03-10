@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAIProvider, isProxyMode } from '../hooks/useAIProvider';
-import { Send, BrainCircuit, User, Trash2 } from 'lucide-react';
+import { Send, BrainCircuit, User, Trash2, Calendar, PlayCircle, ChevronRight, ClipboardList } from 'lucide-react';
 import type { AIWorkoutSuggestion } from '../lib/ai/types';
 import SuggestedAction from '../components/SuggestedAction';
 import ReviewCard from '../components/ReviewCard';
@@ -10,7 +10,7 @@ import { generateId } from '../lib/id';
 
 import { EQUIPMENT_DB } from '../db/equipment';
 import { db } from '../db/database';
-import type { ChatMessage, UserProfile, Exercise } from '../db/database';
+import type { ChatMessage, UserProfile, Exercise, Template } from '../db/database';
 import { getUserProfile } from '../db/userProfileService';
 import { saveAsTemplate } from '../db/templateService';
 import { addAliasToExercise, buildExerciseCatalogContext } from '../db/exerciseService';
@@ -37,6 +37,8 @@ export default function Coach() {
 
     // Load chat history from Dexie (live — updates automatically when other tabs or hooks write to it)
     const storedMessages = useLiveQuery(() => db.chatMessages.orderBy('timestamp').toArray());
+    const weeklyPlans = useLiveQuery(() => db.weeklyPlans.orderBy('weekStartDate').reverse().limit(7).toArray());
+    const allTemplates = useLiveQuery(() => db.templates.toArray());
 
     // One-time migration: move localStorage coach history into Dexie
     useEffect(() => {
@@ -198,8 +200,30 @@ export default function Coach() {
                 }
             }
 
-            // Build Recent Workouts String with full exercise + set data
+            // ── LONG-TERM MEMORY: compressed summaries from past weeks ────────
+            let longTermMemoryContext = "";
+            try {
+                const pastPlans = await db.weeklyPlans
+                    .orderBy('weekStartDate')
+                    .reverse()
+                    .limit(5)  // grab 5 to skip current active week + get up to 4 past
+                    .toArray();
+                // Skip the first (current active week), take those with summaryMetadata
+                const compressed = pastPlans.slice(1).filter(p => p.summaryMetadata);
+                if (compressed.length > 0) {
+                    longTermMemoryContext = "LONG-TERM MEMORY (Past Weeks):\n";
+                    compressed.forEach(p => {
+                        const weekDate = new Date(p.weekStartDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                        longTermMemoryContext += `Week of ${weekDate}: ${p.summaryMetadata}\n`;
+                    });
+                }
+            } catch { /* non-critical — continue without long-term memory */ }
+
+            // ── SHORT-TERM MEMORY: full raw data from recent 3 workouts ──────
             let recentHistoryContext = "";
+            if (longTermMemoryContext) {
+                recentHistoryContext = longTermMemoryContext + "\nSHORT-TERM MEMORY (Recent 3 Workouts — Raw Data):\n";
+            }
             if (workouts && workouts.length > 0) {
                 workouts.slice(0, 3).forEach(w => {
                     const date = new Date(w.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -397,6 +421,48 @@ export default function Coach() {
         }
     };
 
+    // ── Dashboard helpers (shown when chat is empty after onboarding) ─────────
+    const showDashboard = storedMessages !== undefined && storedMessages.length === 0 && profile?.onboardingComplete;
+
+    let nextWorkoutInfo: { template: Template; dayLabel: string } | null = null;
+    if (showDashboard && weeklyPlans && allTemplates) {
+        const currentPlan = weeklyPlans[0];
+        if (currentPlan) {
+            const todayDayIndex = (new Date().getDay() + 6) % 7; // 0=Mon, 6=Sun
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            for (let i = 0; i < 7; i++) {
+                const dayIdx = (todayDayIndex + i) % 7;
+                const assignment = currentPlan.dayAssignments[dayIdx];
+                if (assignment?.templateId && !assignment.completedWorkoutId) {
+                    const tmpl = allTemplates.find(t => t.id === assignment.templateId);
+                    if (tmpl) {
+                        nextWorkoutInfo = {
+                            template: tmpl,
+                            dayLabel: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : dayNames[dayIdx],
+                        };
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    const recentScores = weeklyPlans
+        ?.filter(p => p.weeklyScore !== undefined)
+        .map(p => p.weeklyScore!);
+    const avgScore = recentScores && recentScores.length > 0
+        ? recentScores.slice(0, 3).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 3)
+        : null;
+    const currentBlockWeek = profile?.currentBlockWeek ?? 1;
+
+    const scoreTone = (() => {
+        if (avgScore === null) return 'Ready to start?';
+        if (avgScore >= 80) return `Week ${currentBlockWeek} is where it gets real. Let's build.`;
+        if (avgScore >= 60) return `You're on track. ${nextWorkoutInfo?.dayLabel ?? 'your next workout'} is ready when you are.`;
+        if (avgScore >= 40) return `Last week was tough. Today we keep it simple.`;
+        return `No pressure. Let's do one thing today and rebuild from here.`;
+    })();
+
     // Active Chat UI
     return (
         <div className="page-content coach-chat-page">
@@ -421,6 +487,82 @@ export default function Coach() {
                 </div>
             )}
 
+            {showDashboard ? (
+                <div className="coach-dashboard">
+                    {/* Greeting header */}
+                    <div className="coach-dash-greeting">
+                        <p className="coach-dash-week-label">Week {currentBlockWeek} of 6 · {profile?.goal} Program</p>
+                        <p className="coach-dash-tone">{scoreTone}</p>
+                    </div>
+
+                    {/* 6-week roadmap */}
+                    <div className="coach-dash-card">
+                        <p className="coach-dash-card-title"><Calendar size={14} /> 6-Week Roadmap</p>
+                        <div className="coach-dash-roadmap">
+                            {[1, 2, 3, 4, 5, 6].map(w => {
+                                const isPast = w < currentBlockWeek;
+                                const isCurrent = w === currentBlockWeek;
+                                const score = recentScores && recentScores.length > 0
+                                    ? recentScores[currentBlockWeek - w]
+                                    : undefined;
+                                return (
+                                    <div key={w} className="coach-dash-week-col">
+                                        <div className={`coach-dash-dot ${isPast ? 'past' : isCurrent ? 'current' : 'future'}`}>
+                                            {isPast ? '✓' : isCurrent ? w : ''}
+                                        </div>
+                                        <span className="coach-dash-dot-label">W{w}</span>
+                                        {score !== undefined && <span className="coach-dash-dot-score">{Math.round(score)}</span>}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Next Step card */}
+                    {nextWorkoutInfo ? (
+                        <div className="coach-dash-card coach-dash-next">
+                            <p className="coach-dash-card-title"><PlayCircle size={14} /> Next Step</p>
+                            <div className="coach-dash-next-info">
+                                <span className="coach-dash-next-day">{nextWorkoutInfo.dayLabel}</span>
+                                <span className="coach-dash-next-name">{nextWorkoutInfo.template.name}</span>
+                                <span className="coach-dash-next-meta">
+                                    {nextWorkoutInfo.template.exercises.length} exercise{nextWorkoutInfo.template.exercises.length !== 1 ? 's' : ''}
+                                </span>
+                            </div>
+                            <button
+                                className="coach-dash-start-btn"
+                                onClick={() => navigate(`/templates/${nextWorkoutInfo!.template.id}`)}
+                            >
+                                Start Workout <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="coach-dash-card">
+                            <p className="coach-dash-card-title"><PlayCircle size={14} /> Next Step</p>
+                            <p className="coach-dash-empty-note">No workouts scheduled — do a weekly check-in to plan your week.</p>
+                        </div>
+                    )}
+
+                    {/* Quick Actions */}
+                    <div className="coach-dash-actions">
+                        <button className="coach-dash-action-btn" onClick={() => {
+                            // Open weekly check-in — set the draft to trigger the parent to open the modal
+                            setDraft('Build me this week\'s plan');
+                        }}>
+                            <ClipboardList size={18} />
+                            Weekly Check-In
+                        </button>
+                        <button className="coach-dash-action-btn primary" onClick={() => {
+                            setDraft('');
+                            // Focus the input to start typing
+                            document.querySelector<HTMLInputElement>('.chat-input')?.focus();
+                        }}>
+                            <BrainCircuit size={18} />
+                            Ask Coach
+                        </button>
+                    </div>
+                </div>
+            ) : (
             <div className="chat-history">
                 {displayMessages.map((msg) => {
                     // Review card messages get their own rich renderer
@@ -484,6 +626,7 @@ export default function Coach() {
                 )}
                 <div style={{ height: 20 }} ref={messagesEndRef}></div>
             </div>
+            )}
 
             <form className="chat-input-area" onSubmit={handleSendMessage}>
                 <input

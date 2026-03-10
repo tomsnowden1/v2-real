@@ -57,10 +57,17 @@ export async function runOnboardingCompletion(
 
         if (hasApiKey) {
             // ── 4. Build CheckInAnswers from the new profile ──────────────────────
+            const bodyStatusParts: string[] = [];
+            if (profile.preferences?.trim()) {
+                bodyStatusParts.push(`Movement restrictions / injuries: ${profile.preferences}`);
+            }
+            if (profile.personalContext?.trim()) {
+                bodyStatusParts.push(`SAFETY CONSTRAINTS — USER-REPORTED (treat as hard constraints, avoid exercises stressing these areas): ${profile.personalContext.trim()}`);
+            }
             const answers: CheckInAnswers = {
                 daysAvailable: profile.targetWorkoutDays ?? 3,
-                bodyStatus: profile.preferences?.trim()
-                    ? `Movement restrictions / injuries: ${profile.preferences}`
+                bodyStatus: bodyStatusParts.length > 0
+                    ? bodyStatusParts.join(' | ')
                     : 'No known injuries or movement restrictions.',
                 variety: 'Mix it up',
                 satisfaction: `First week — brand new user. Goal: ${profile.goal}. Experience: ${profile.experienceLevel ?? 'unspecified'}.`,
@@ -147,6 +154,9 @@ export async function runOnboardingCompletion(
         const sleepStress = (profile.sleepHours || profile.stressLevel)
             ? `\n- **Recovery context:** ${[profile.sleepHours ? `${profile.sleepHours} hrs sleep` : null, profile.stressLevel ? `${profile.stressLevel.toLowerCase()} stress` : null].filter(Boolean).join(', ')} — I'll factor this into volume decisions.`
             : '';
+        const personalContextNote = profile.personalContext?.trim()
+            ? `\n- **Coach notes:** ${profile.personalContext.trim()}`
+            : '';
         const noKeyNote = !hasApiKey
             ? '\n\n⚠️ **No AI key configured yet.** Go to Settings → AI to add your API key, then I can generate your first week and analyse your sessions.'
             : '';
@@ -160,6 +170,7 @@ export async function runOnboardingCompletion(
             preferences,
             blockers,
             sleepStress,
+            personalContextNote,
             profile.preferences ? `- **Constraints:** ${profile.preferences}` : '',
             '',
             `Your program uses a **6-week block** — Week 1 starts at reduced volume so your body adapts, builds through weeks 2–5, then week 6 is a planned lighter recovery week. This cycle then repeats.`,

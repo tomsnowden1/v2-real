@@ -112,6 +112,7 @@ export interface UserProfile {
     sleepHours?: '<6' | '6-7' | '7-8' | '8+';
     stressLevel?: 'Low' | 'Moderate' | 'High';
     onboardingComplete?: boolean;     // true once onboarding orchestrator has run
+    personalContext?: string;         // free-text "Anything else?" from final onboarding step (max 300 chars)
 }
 
 export interface Template {
@@ -134,6 +135,7 @@ export interface WeeklyPlan {
     completedWorkouts: string[]; // array of workoutHistory IDs
     hasCheckedIn?: boolean; // True if the user has completed the start-of-week check-in
     weeklyScore?: number;  // 0-100 adherence score; calculated from missed/recovered days
+    summaryMetadata?: string; // AI-compressed snapshot of this week's performance (~30 words)
 }
 
 export interface ChatMessage {
@@ -327,6 +329,14 @@ class IronDatabase extends Dexie {
         // consistencyBlockers, sleepHours, stressLevel, onboardingComplete.
         // All optional — no data migration needed.
         this.version(17).stores({});
+
+        // Version 18: Token compression — adds optional summaryMetadata to WeeklyPlan.
+        // No index needed (never queried directly). No data migration needed.
+        this.version(18).stores({});
+
+        // Version 19: Adds optional personalContext to UserProfile.
+        // Captured at the end of the onboarding wizard. No data migration needed.
+        this.version(19).stores({});
     }
 }
 
