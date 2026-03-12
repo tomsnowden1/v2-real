@@ -58,7 +58,7 @@
 }
 
 .icon-warning {
-    color: #f59e0b;
+    color: var(--color-warning);
     /* amber for warnings */
 }
 
@@ -103,7 +103,7 @@
     border-radius: 8px;
     background: var(--color-surface);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .resolve-option:hover {
@@ -129,7 +129,7 @@
 }
 
 .option-name {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .option-meta {
@@ -166,7 +166,7 @@
 .confidence-badge {
     display: inline-block;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     margin-bottom: var(--spacing-sm);
     padding: 2px 8px;
     border-radius: var(--radius-full, 999px);
@@ -214,9 +214,9 @@
     padding: 10px 20px;
     min-width: 120px;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     font-size: 0.95rem;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     cursor: pointer;
 }
 

@@ -15,7 +15,7 @@
 
 .progress-header h2 {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     margin: 0;
 }

@@ -27,7 +27,7 @@
 }
 
 .score-ring-value {
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     line-height: 1;
 }
 
@@ -37,7 +37,7 @@
     letter-spacing: 1px;
     color: var(--color-text-muted);
     margin-top: 4px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
 }
 
 /* Color Thresholds */

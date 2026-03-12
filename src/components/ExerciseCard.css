@@ -12,12 +12,11 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: var(--spacing-md);
-    border-bottom: 1px solid transparent;
 }
 
 .exercise-title {
     font-size: var(--font-base);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     margin-bottom: 4px;
     display: flex;
@@ -33,7 +32,7 @@
 
 .superset-badge {
     font-size: var(--font-2xs);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     background: linear-gradient(135deg, #8b5cf6, #6d28d9);
     color: white;
     padding: 2px 8px;
@@ -49,7 +48,7 @@
 
 .pill {
     font-size: var(--font-tiny);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     background-color: var(--color-bg);
     color: var(--color-text-muted);
     padding: 2px 8px;
@@ -69,12 +68,16 @@
     justify-content: center;
     color: var(--color-text-muted);
     border-radius: var(--radius-full);
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .icon-btn:hover {
     background-color: var(--color-bg);
     color: var(--color-text-main);
+}
+
+.icon-btn:active {
+    transform: scale(0.90);
 }
 
 .table-header {
@@ -83,7 +86,7 @@
     margin: 0 4px;
     border-bottom: 1px solid var(--color-border);
     font-size: var(--font-tiny);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-muted);
     letter-spacing: 0.5px;
 }
@@ -136,16 +139,22 @@
     width: 100%;
     padding: 10px;
     font-size: var(--font-sm);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-muted);
-    background-color: var(--color-bg);
+    background-color: transparent;
+    border: 1.5px dashed var(--color-border);
     border-radius: var(--radius-sm);
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .add-set-btn:hover {
-    background-color: var(--color-border);
-    color: var(--color-text-main);
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.add-set-btn:active {
+    transform: scale(0.98);
 }
 
 /* ── Advanced Toggle Button ── */
@@ -154,14 +163,14 @@
     border: none;
     color: var(--color-text-muted);
     font-size: var(--font-xs);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     display: flex;
     align-items: center;
     gap: 4px;
     cursor: pointer;
     padding: 6px 8px;
     border-radius: var(--radius-sm);
-    transition: all 0.2s;
+    transition: all var(--transition-base);
     white-space: nowrap;
 }
 
@@ -175,8 +184,8 @@
 .advanced-panel {
     border-top: 1px solid var(--color-border);
     background-color: var(--color-bg);
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
 }
 
 .adv-section {
@@ -193,7 +202,7 @@
     align-items: center;
     gap: 6px;
     font-size: var(--font-xs);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -206,18 +215,18 @@
 
 .adv-skip-btn {
     font-size: var(--font-xs);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-primary);
-    background: rgba(30, 189, 123, 0.1);
+    background: var(--color-primary-subtle);
     border: none;
     padding: 3px 10px;
     border-radius: 99px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .adv-skip-btn:hover {
-    background: rgba(30, 189, 123, 0.2);
+    background: var(--color-primary-muted);
 }
 
 .adv-hint {
@@ -253,14 +262,14 @@
 
 .rest-nudge-btn {
     font-size: var(--font-xs);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     padding: 4px 10px;
     border-radius: 99px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .rest-nudge-btn:hover {
@@ -280,10 +289,11 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--color-surface);
+    background: var(--color-surface-2);
     border-radius: var(--radius-sm);
     padding: 12px;
     border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-xs);
 }
 
 .load-prev,
@@ -296,7 +306,7 @@
 
 .load-prev-label {
     font-size: var(--font-2xs);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--color-text-muted);
@@ -304,7 +314,7 @@
 
 .load-prev-value {
     font-size: var(--font-sm);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
 }
 
@@ -315,7 +325,7 @@
 
 .load-arrow {
     font-size: var(--font-2xl);
-    font-weight: 800;
+    font-weight: var(--fw-extrabold);
     line-height: 1;
 }
 
@@ -325,14 +335,14 @@
     align-items: center;
     gap: 6px;
     font-size: var(--font-xs);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: #8b5cf6;
     background: rgba(139, 92, 246, 0.08);
     border: 1px dashed rgba(139, 92, 246, 0.4);
     border-radius: var(--radius-sm);
     padding: 8px 14px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
     width: 100%;
     justify-content: center;
 }
@@ -357,7 +367,7 @@
 .superset-linked-label {
     font-size: var(--font-xs);
     color: #8b5cf6;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .superset-unlink-btn {
@@ -365,14 +375,14 @@
     align-items: center;
     gap: 5px;
     font-size: var(--font-xs);
-    font-weight: 600;
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.08);
+    font-weight: var(--fw-semibold);
+    color: var(--color-error);
+    background: var(--color-error-subtle);
     border: none;
     border-radius: 99px;
     padding: 4px 10px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .superset-unlink-btn:hover {
@@ -392,10 +402,10 @@
     border-radius: var(--radius-sm);
     padding: 10px 14px;
     font-size: var(--font-sm);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-main);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .superset-pick-option:hover {
@@ -428,7 +438,7 @@
 }
 
 .load-arrow-up {
-    color: #10b981;
+    color: var(--color-primary);
 }
 
 .load-arrow-same {
@@ -436,7 +446,7 @@
 }
 
 .load-arrow-down {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .load-arrow-none {
@@ -444,7 +454,7 @@
 }
 
 .load-prev-value-up {
-    color: #10b981;
+    color: var(--color-primary);
 }
 
 .load-prev-value-same {
@@ -452,7 +462,7 @@
 }
 
 .load-prev-value-down {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .load-prev-value-none {

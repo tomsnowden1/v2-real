@@ -7,7 +7,7 @@
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-nav);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -24,25 +24,30 @@
     justify-content: center;
     text-decoration: none;
     color: var(--color-text-muted);
-    font-size: 11px;
-    font-weight: 500;
+    font-size: var(--font-tiny);
+    font-weight: var(--fw-medium);
     gap: 4px;
     flex: 1;
     height: 100%;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-base);
     border-radius: var(--radius-lg);
 }
 
+.nav-item:hover {
+    color: var(--color-text-main);
+}
+
 .nav-item:active {
-    transform: scale(0.95);
+    transform: scale(0.93);
 }
 
 .nav-item.active {
     color: var(--color-primary);
+    background-color: var(--color-primary-subtle);
 }
 
 .nav-item.active svg {
     stroke-width: 2.5px;
     transform: translateY(-2px);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--transition-base);
 }

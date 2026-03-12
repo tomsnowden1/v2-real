@@ -83,7 +83,7 @@
 .checkin-header h2 {
     margin: 0;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
     display: flex;
     align-items: center;
@@ -104,7 +104,7 @@
     cursor: pointer;
     padding: 4px;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     flex-shrink: 0;
 }
 
@@ -128,7 +128,7 @@
     height: 8px;
     border-radius: 50%;
     background-color: var(--color-border);
-    transition: all 0.3s ease;
+    transition: all var(--transition-slow);
 }
 
 .checkin-step-dot.active {
@@ -171,7 +171,7 @@
 
 .form-group label {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -224,7 +224,7 @@
 
 .days-value {
     font-size: 24px;
-    font-weight: 800;
+    font-weight: var(--fw-extrabold);
     color: var(--color-primary);
     min-width: 36px;
     text-align: center;
@@ -242,7 +242,7 @@
     color: var(--color-text-main);
     font-size: 14px;
     font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-base);
     resize: vertical;
 }
 
@@ -280,7 +280,7 @@
     border: none;
     background: none;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-muted);
     cursor: pointer;
     border-radius: 9px;
@@ -290,7 +290,7 @@
 .variety-toggle button.active {
     background-color: var(--color-primary);
     color: #fff;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     box-shadow: 0 2px 8px rgba(30, 189, 123, 0.3);
 }
 
@@ -298,10 +298,10 @@
 .error-banner {
     padding: 12px 16px;
     border-radius: 12px;
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    background-color: var(--color-error-subtle);
+    color: var(--color-error);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     border: 1px solid rgba(239, 68, 68, 0.2);
     line-height: 1.5;
 }
@@ -319,7 +319,7 @@
 
 .checkin-loading h3 {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
     margin: 0;
 }
@@ -367,7 +367,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(30, 189, 123, 0.08);
+    background: var(--color-primary-subtle);
     animation: pulse-ring 2s ease-out infinite;
 }
 
@@ -380,7 +380,7 @@
 
 .review-title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
     margin: 0;
     display: flex;
@@ -419,14 +419,14 @@
 .proposed-card-header h4 {
     margin: 0;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
 }
 
 .proposed-card-header span {
     font-size: 12px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     background: var(--color-bg);
     padding: 3px 10px;
     border-radius: 20px;
@@ -451,7 +451,7 @@
 .proposed-ex-rep {
     color: var(--color-text-muted);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .proposed-ex.overflow {
@@ -482,9 +482,9 @@
     background: linear-gradient(135deg, var(--color-primary), #17a066);
     color: #fff;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     letter-spacing: 0.2px;
 }
 

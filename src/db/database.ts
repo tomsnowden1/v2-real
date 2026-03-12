@@ -136,6 +136,7 @@ export interface WeeklyPlan {
     hasCheckedIn?: boolean; // True if the user has completed the start-of-week check-in
     weeklyScore?: number;  // 0-100 adherence score; calculated from missed/recovered days
     summaryMetadata?: string; // AI-compressed snapshot of this week's performance (~30 words)
+    aiRecap?: string; // AI-generated 2-3 sentence weekly recap shown on Home dashboard
 }
 
 export interface ChatMessage {

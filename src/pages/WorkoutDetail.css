@@ -20,7 +20,7 @@
 
 .wd-title {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
     flex: 1;
     text-align: center;
@@ -35,7 +35,7 @@
     padding: 10px 20px;
     border-radius: var(--radius-md);
     border: none;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
 }
 
@@ -86,7 +86,7 @@
 
 .wd-stat-value {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
     line-height: 1.2;
 }
@@ -104,7 +104,7 @@
 
 .wd-section-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0 0 var(--spacing-md);
     color: var(--color-text-main);
 }
@@ -137,12 +137,12 @@
 .wd-score-bar-label {
     font-size: 13px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .wd-score-bar-value {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
 }
 
 .wd-score-bar-track {
@@ -179,7 +179,7 @@
     background: var(--color-primary);
     color: #fff;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +189,7 @@
 .wd-ex-name {
     flex: 1;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -199,7 +199,7 @@
 .wd-ex-vol {
     font-size: 13px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     white-space: nowrap;
 }
 
@@ -224,7 +224,7 @@
 .wd-sets-header-row {
     font-size: 12px;
     color: var(--color-text-muted);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     background: var(--color-bg);
@@ -237,7 +237,7 @@
 .wd-set-col-num {
     width: 36px;
     flex-shrink: 0;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .wd-set-col-type {
@@ -247,21 +247,21 @@
 
 .wd-set-col-weight {
     flex: 1;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
 }
 
 .wd-set-col-reps {
     width: 60px;
     text-align: right;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-main);
 }
 
 /* ── Set Type Badges ─────────────────────────────────────────────── */
 .wd-badge {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     padding: 2px 8px;
     border-radius: 20px;
     text-align: center;
@@ -281,12 +281,12 @@
 
 .wd-badge-drop {
     background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .wd-badge-failure {
     background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
+    color: var(--color-error);
 }
 
 /* ── Repeat Button ───────────────────────────────────────────────── */
@@ -300,16 +300,16 @@
     margin-top: var(--spacing-md);
     border: 1px solid var(--color-primary);
     border-radius: var(--radius-md);
-    background: rgba(30, 189, 123, 0.08);
+    background: var(--color-primary-subtle);
     color: var(--color-primary);
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .wd-repeat-btn:hover {
-    background: rgba(30, 189, 123, 0.15);
+    background: var(--color-primary-muted);
     border-color: var(--color-primary);
 }
 
@@ -327,7 +327,7 @@
     background: transparent;
     color: #3b82f6;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
@@ -349,16 +349,16 @@
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: var(--radius-md);
     background: transparent;
-    color: #ef4444;
+    color: var(--color-error);
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .wd-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: #ef4444;
+    background: var(--color-error-subtle);
+    border-color: var(--color-error);
 }
 
 /* ── Delete Confirmation Modal ───────────────────────────────────── */
@@ -409,7 +409,7 @@
 
 .wd-modal h3 {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     margin: 0 0 8px;
 }
 
@@ -431,7 +431,7 @@
     padding: 12px;
     border-radius: var(--radius-md);
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     border: none;
     transition: background 0.15s ease;
@@ -447,7 +447,7 @@
 }
 
 .wd-modal-delete {
-    background: #ef4444;
+    background: var(--color-error);
     color: #fff;
 }
 

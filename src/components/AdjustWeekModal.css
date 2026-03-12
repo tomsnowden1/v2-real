@@ -43,7 +43,7 @@
 
 .adjust-header h2 {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
     color: var(--color-text-main);
 }
@@ -110,9 +110,9 @@
     background-color: transparent;
     color: var(--color-text-main);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .day-btn.selected {
@@ -134,13 +134,13 @@
     border-radius: var(--radius-lg);
     padding: 16px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
 }
 
 .primary-save-btn:active {

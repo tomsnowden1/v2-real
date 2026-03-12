@@ -57,7 +57,7 @@
 
 .welcome-title {
     font-size: var(--font-5xl);
-    font-weight: 800;
+    font-weight: var(--fw-extrabold);
     background: linear-gradient(135deg, #1ebd7b, #0ea5e9);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -82,10 +82,10 @@
     border-radius: var(--radius-full);
     padding: 16px 48px;
     font-size: var(--font-lg);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     animation: fadeInUp 0.8s ease-out 0.6s both;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
     box-shadow: 0 4px 16px rgba(30, 189, 123, 0.3);
 }
 
@@ -118,7 +118,7 @@
     padding: 16px;
     background-color: var(--color-surface);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     animation: fadeInUp 0.5s ease-out both;
 }
 
@@ -152,7 +152,7 @@
 .feature-text h3 {
     margin: 0 0 4px;
     font-size: var(--font-sm);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
 }
 
@@ -166,10 +166,10 @@
 .coming-soon-badge {
     display: inline-block;
     font-size: var(--font-2xs);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-error));
     color: white;
     padding: 3px 8px;
     border-radius: var(--radius-full);
@@ -191,7 +191,7 @@
     height: 8px;
     border-radius: 50%;
     background-color: var(--color-border);
-    transition: all 0.3s;
+    transition: all var(--transition-slow);
 }
 
 .step-dot.active {
@@ -213,7 +213,7 @@
 
 .goal-header h1 {
     font-size: var(--font-3xl);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
     margin-bottom: var(--spacing-sm);
 }
@@ -240,8 +240,8 @@
     align-items: center;
     gap: var(--spacing-md);
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
 }
 
 .goal-card:hover {
@@ -271,7 +271,7 @@
 .goal-card-text h3 {
     margin: 0;
     font-size: var(--font-base);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     margin-bottom: 4px;
 }
@@ -292,7 +292,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .goal-card.selected .goal-card-radio {
@@ -313,9 +313,9 @@
     border-radius: var(--radius-md);
     padding: 16px;
     font-size: var(--font-base);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
     margin-top: var(--spacing-md);
 }
 
@@ -351,9 +351,9 @@
     background-color: var(--color-surface);
     color: var(--color-text-main);
     font-size: var(--font-xl);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -386,7 +386,7 @@
     font-size: var(--font-sm);
     cursor: pointer;
     padding: 4px 0;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .back-btn-wizard:hover {
@@ -436,13 +436,13 @@
 }
 
 .feature-icon-amber {
-    background-color: #f59e0b15;
-    color: #f59e0b;
+    background-color: var(--color-warning)15;
+    color: var(--color-warning);
 }
 
 .feature-icon-red {
-    background-color: #ef444415;
-    color: #ef4444;
+    background-color: var(--color-error)15;
+    color: var(--color-error);
 }
 
 .button-margin-top-large {
@@ -513,9 +513,9 @@
     background: var(--color-surface);
     color: var(--color-text-muted);
     font-size: var(--font-sm);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .unit-toggle-btn.active {
@@ -543,7 +543,7 @@
 
 .baseline-label {
     font-size: var(--font-sm);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-main);
     flex: 1;
 }
@@ -562,7 +562,7 @@
     background: var(--color-bg);
     color: var(--color-text-main);
     font-size: var(--font-base);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     text-align: right;
 }
 
@@ -594,11 +594,11 @@
     border-radius: var(--radius-md);
     color: var(--color-text-muted);
     font-size: var(--font-sm);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     padding: 12px 16px;
     cursor: pointer;
     margin-top: 12px;
-    transition: border-color 0.2s, color 0.2s;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
     width: 100%;
 }
 

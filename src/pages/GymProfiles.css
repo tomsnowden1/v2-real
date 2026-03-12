@@ -19,7 +19,7 @@
 
 .gym-header h1 {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     margin: 0;
     position: absolute;
     left: 50%;
@@ -78,7 +78,7 @@
 .save-btn {
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     border-radius: var(--radius-sm);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .gym-icon-wrapper {
-    background-color: rgba(30, 189, 123, 0.1);
+    background-color: var(--color-primary-subtle);
     color: var(--color-primary);
     width: 48px;
     height: 48px;
@@ -131,7 +131,7 @@
 .gym-name {
     margin: 0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
 }
 
@@ -147,7 +147,7 @@
 }
 
 .delete-btn:hover {
-    color: #ef4444;
+    color: var(--color-error);
     background-color: #fee2e2;
 }
 
@@ -161,7 +161,7 @@
     color: white;
     padding: 12px 24px;
     border-radius: var(--radius-sm);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
 }
 
 .empty-icon {

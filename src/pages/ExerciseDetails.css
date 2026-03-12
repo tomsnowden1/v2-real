@@ -29,7 +29,7 @@
 
 .details-title {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
     flex: 1;
     text-align: center;
@@ -46,7 +46,7 @@
     background-color: var(--color-surface);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
 }
 
 .card-header-flex {
@@ -58,7 +58,7 @@
 
 .card-header-flex h2 {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
 }
 
@@ -134,7 +134,7 @@
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .muscle-tag.primary {
@@ -172,7 +172,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 .variation-label {
@@ -220,18 +220,18 @@
 }
 
 .pr-metric {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-secondary);
 }
 
 .pr-value {
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
 }
 
 /* Video Placeholder */
 .icon-youtube {
-    color: #ef4444;
+    color: var(--color-error);
     /* red-500 */
 }
 
@@ -247,7 +247,7 @@
     gap: var(--spacing-sm);
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .video-placeholder:hover {

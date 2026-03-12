@@ -58,7 +58,7 @@
 .finish-sheet-header h2 {
     margin: 0 0 6px;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     color: var(--color-text-main);
 }
 
@@ -78,7 +78,7 @@
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--color-text-muted);
@@ -100,7 +100,7 @@
     border: 2px solid var(--color-border);
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     text-align: left;
     width: 100%;
 }
@@ -124,7 +124,7 @@
     align-items: center;
     justify-content: center;
     margin-top: 1px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .template-option.selected .template-option-radio {
@@ -139,7 +139,7 @@
     background: white;
     opacity: 0;
     transform: scale(0);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .template-option.selected .template-option-radio-inner {
@@ -150,7 +150,7 @@
 .template-option-text h4 {
     margin: 0 0 2px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
 }
 
@@ -180,7 +180,7 @@
 .coach-toggle-info h4 {
     margin: 0 0 2px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-text-main);
     display: flex;
     align-items: center;
@@ -214,7 +214,7 @@
     inset: 0;
     background: var(--color-border);
     border-radius: 28px;
-    transition: all 0.3s ease;
+    transition: all var(--transition-slow);
 }
 
 .toggle-slider::before {
@@ -226,7 +226,7 @@
     bottom: 3px;
     background: white;
     border-radius: 50%;
-    transition: all 0.3s ease;
+    transition: all var(--transition-slow);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -256,9 +256,9 @@
     padding: 16px;
     border-radius: 14px;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     border: none;
 }
 

@@ -17,7 +17,7 @@
 
 .gym-equip-header h1 {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -55,7 +55,7 @@
     padding: var(--spacing-md) 0;
     border-bottom: 1px solid var(--color-border);
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
 }
 
 .equip-item:active {
@@ -74,14 +74,14 @@
 
 .equip-name {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-main);
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .equip-item.selected .equip-name {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
 }
 
 .checkbox-circle {
@@ -93,7 +93,7 @@
     align-items: center;
     justify-content: center;
     color: white;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
 }
 
 .checkbox-circle.checked {
@@ -104,7 +104,7 @@
 /* ── Category header ─────────────────────────── */
 .category-header {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--color-primary);
     padding: 14px 0 8px;
     text-transform: uppercase;
@@ -147,8 +147,8 @@
     height: 28px;
     border-radius: var(--radius-full);
     background: transparent;
-    border: 1px solid var(--color-danger, #ef4444);
-    color: var(--color-danger, #ef4444);
+    border: 1px solid var(--color-danger, var(--color-error));
+    color: var(--color-danger, var(--color-error));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,7 +172,7 @@
     align-items: center;
     padding: 4px;
     border-radius: 50%;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .clear-search-btn:hover {
@@ -231,7 +231,7 @@
 
 .equip-modal-header h2 {
     font-size: 17px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     margin: 0;
 }
 
@@ -244,7 +244,7 @@
     display: flex;
     align-items: center;
     border-radius: 50%;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .equip-modal-close:hover {
@@ -266,7 +266,7 @@
 
 .equip-field label {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -282,7 +282,7 @@
     color: var(--color-text-main);
     width: 100%;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition-fast);
 }
 
 .equip-field input:focus,
@@ -292,7 +292,7 @@
 
 .equip-field-error {
     font-size: 12px;
-    color: var(--color-danger, #ef4444);
+    color: var(--color-danger, var(--color-error));
     margin-top: 2px;
 }
 
@@ -310,9 +310,9 @@
     border: 1px solid var(--color-border);
     color: var(--color-text-main);
     font-size: 15px;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
 }
 
 .equip-modal-footer .btn-primary {
@@ -323,9 +323,9 @@
     border: none;
     color: white;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
 }
 
 .equip-modal-footer .btn-secondary:active,

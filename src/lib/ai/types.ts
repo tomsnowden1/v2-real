@@ -196,6 +196,17 @@ export interface AIProvider {
     ): Promise<AIResponse<PostWorkoutReview>>;
 
     /**
+     * Compresses a week's worth of workouts into a dense ~30-word metadata string
+     * for long-term memory. Used to reduce token usage in the Coach system prompt.
+     */
+    generateWeeklyCompression(
+        apiKey: string,
+        model: string,
+        workouts: WorkoutHistory[],
+        profile: UserProfile
+    ): Promise<AIResponse<string>>;
+
+    /**
      * Generates a structural JSON array of N new templates based on the user's check-in answers.
      */
     generateWeeklyPlanUpdate(

@@ -2,7 +2,7 @@
     background-color: var(--color-surface);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--color-border);
     margin-bottom: var(--spacing-xl);
 }
@@ -15,12 +15,28 @@
 }
 
 .weekly-view-header h2 {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-base);
+    font-weight: var(--fw-semibold);
     margin: 0;
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.adjust-week-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.adjust-week-btn:hover {
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
 }
 
 .weekly-view-days {
@@ -36,26 +52,32 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     padding: 8px 4px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     cursor: pointer;
+}
+
+.day-column:hover {
+    background-color: var(--color-bg);
+    transform: translateY(-1px);
 }
 
 .day-column:active {
     background-color: var(--color-bg);
+    transform: translateY(0);
 }
 
 .day-label {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--font-xs);
+    font-weight: var(--fw-semibold);
     color: var(--color-text-muted);
     text-transform: uppercase;
 }
 
 .day-column.is-today .day-label {
     color: var(--color-text-main);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
 }
 
 .day-indicator {
@@ -66,7 +88,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 /* Rest day */
@@ -85,11 +107,10 @@
 /* Scheduled (today) */
 .day-indicator.type-today {
     border: 2px solid var(--color-primary);
-    background-color: rgba(30, 189, 123, 0.1);
-    /* light tinted background */
+    background-color: var(--color-primary-subtle);
     color: var(--color-primary);
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(30, 189, 123, 0.2);
+    box-shadow: var(--shadow-primary);
 }
 
 /* Completed */
@@ -102,7 +123,7 @@
 /* Missed (Past scheduled but not done) */
 .day-indicator.type-missed {
     border: 2px solid rgba(239, 68, 68, 0.3);
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: var(--color-error-subtle);
     color: rgba(239, 68, 68, 0.6);
 }
 
@@ -122,7 +143,7 @@
 
 .day-subtitle.is-today {
     color: var(--color-primary);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 }
 
 /* Pulse animation for today's dot */

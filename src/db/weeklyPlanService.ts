@@ -1,4 +1,6 @@
 import { db, type WeeklyPlan, type UserProfile } from './database';
+import type { AIProvider } from '../lib/ai/types';
+import { buildWeeklyRecapMessage } from '../lib/ai/coachPrompts';
 
 function getStartOfWeek(date = new Date()): Date {
     const d = new Date(date);
@@ -209,4 +211,71 @@ export async function recoverMissedDay(weekId: string, dayIndex: number, workout
         completedWorkouts,
         weeklyScore: recoveredScore,
     });
+}
+
+// ── Coach's Note: Weekly Recap ─────────────────────────────────────────────────
+
+/**
+ * Fire-and-forget: generate a 2-3 sentence AI coach's note for the current week
+ * and save it to plan.aiRecap. Skips silently if a recap already exists.
+ */
+export async function generateAndSaveWeeklyRecap(
+    apiKey: string,
+    model: string,
+    provider: AIProvider,
+    profile: UserProfile,
+    trackUsage: (model: string, prompt: number, completion: number) => void
+): Promise<void> {
+    try {
+        const plan = await getCurrentWeeklyPlan();
+        if (plan.aiRecap) return; // already generated — don't overwrite
+
+        const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const todayIndex = (new Date().getDay() + 6) % 7;
+
+        const planned = plan.dayAssignments.filter(d => d.templateId !== null).length;
+        const completed = plan.dayAssignments.filter(d => !!d.completedWorkoutId).length;
+        const missedDayNames = plan.dayAssignments
+            .map((d, i) => ({ ...d, i }))
+            .filter(({ templateId, completedWorkoutId, i }) =>
+                templateId && !completedWorkoutId && i < todayIndex)
+            .map(({ i }) => DAY_NAMES[i]);
+
+        // Gather PRs set this week
+        const weekPRs = await db.prs
+            .where('date').aboveOrEqual(plan.weekStartDate)
+            .toArray();
+        const exerciseIds = [...new Set(weekPRs.map(pr => pr.exerciseId))];
+        const exercises = await db.exercises.bulkGet(exerciseIds);
+        const exerciseMap = Object.fromEntries(
+            exercises.filter(Boolean).map(e => [e!.id, e!.name])
+        );
+        const prList = weekPRs.map(pr =>
+            `${exerciseMap[pr.exerciseId] || 'Unknown'} (${pr.metric}: ${pr.value})`
+        );
+
+        const message = buildWeeklyRecapMessage({
+            goal: profile.goal,
+            planned,
+            completed,
+            missedDayNames,
+            prList,
+            weeklyScore: plan.weeklyScore,
+        });
+
+        const response = await provider.sendMessageToCoach(
+            apiKey,
+            model,
+            [{ role: 'user', content: message }]
+        );
+
+        if (response.data) {
+            await db.weeklyPlans.update(plan.id, { aiRecap: response.data.trim() });
+        }
+        if (response.usage) {
+            trackUsage(model, response.usage.promptTokens, response.usage.completionTokens);
+        }
+    } catch (err) {
+        console.warn('Coach recap generation failed (non-critical):', err);
+    }
 }

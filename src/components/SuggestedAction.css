@@ -16,7 +16,7 @@
 
 .sa-icon {
     color: var(--color-primary);
-    background-color: rgba(30, 189, 123, 0.2);
+    background-color: var(--color-primary-muted);
     padding: 6px;
     border-radius: var(--radius-sm);
     width: 32px;
@@ -33,14 +33,14 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--color-primary);
-    font-weight: 700;
+    font-weight: var(--fw-bold);
 }
 
 .sa-title {
     margin: 0;
     font-size: 16px;
     color: var(--color-text-main);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
 }
 
 .sa-exercises {
@@ -62,7 +62,7 @@
 }
 
 .sa-ex-name {
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     font-size: 14px;
     color: var(--color-text-main);
 }
@@ -91,9 +91,9 @@
     gap: 8px;
     background-color: var(--color-primary);
     color: white;
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     font-size: 15px;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition-base);
 }
 
 .sa-apply-btn:active {

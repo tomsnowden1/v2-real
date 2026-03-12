@@ -1,18 +1,63 @@
 import { useState } from 'react';
 import { X, Sparkles, Activity, CalendarDays, HeartPulse, Shuffle, MessageSquare } from 'lucide-react';
-import type { UserProfile } from '../db/database';
+import type { UserProfile, WorkoutHistory } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import { generateId } from '../lib/id';
-import { type CheckInAnswers, type AIWorkoutSuggestion } from '../lib/ai/types';
+import { type CheckInAnswers, type AIWorkoutSuggestion, type AIProvider } from '../lib/ai/types';
 import { useAIProvider } from '../hooks/useAIProvider';
 import { saveAsTemplate } from '../db/templateService';
-import { setTargetTemplates, setWeekCheckedIn } from '../db/weeklyPlanService';
+import { setTargetTemplates, setWeekCheckedIn, generateAndSaveWeeklyRecap } from '../db/weeklyPlanService';
 import { addAliasToExercise } from '../db/exerciseService';
 import ResolveExercisesModal, { type ResolvedChoice } from '../components/ResolveExercisesModal';
 import { resolveExerciseName, type ResolutionResult } from '../lib/exerciseResolver';
 import type { Exercise } from '../db/database';
 import './WeeklyCheckInModal.css';
+
+/**
+ * Fire-and-forget: compress the just-completed week's workouts into a dense
+ * metadata string and save it to the WeeklyPlan record. Non-blocking — errors
+ * are silently logged (the Coach just won't have that week's summary).
+ */
+async function compressCompletedWeek(
+    apiKey: string,
+    model: string,
+    aiProvider: AIProvider,
+    trackUsage: (model: string, prompt: number, completion: number) => void,
+    profile: UserProfile
+) {
+    try {
+        // Get the two most recent weekly plans (current active + just-completed)
+        const recentPlans = await db.weeklyPlans
+            .orderBy('weekStartDate')
+            .reverse()
+            .limit(2)
+            .toArray();
+
+        // The just-completed week is the second one (index 1)
+        const completedPlan = recentPlans[1];
+        if (!completedPlan) return;
+        if (completedPlan.summaryMetadata) return; // already compressed
+
+        // Gather workouts for that week
+        const workoutIds = completedPlan.completedWorkouts || [];
+        if (workoutIds.length === 0) return;
+
+        const workouts = (await db.workoutHistory.bulkGet(workoutIds)).filter(Boolean) as WorkoutHistory[];
+        if (workouts.length === 0) return;
+
+        const response = await aiProvider.generateWeeklyCompression(apiKey, model, workouts, profile);
+
+        if (response.data) {
+            await db.weeklyPlans.update(completedPlan.id, { summaryMetadata: response.data });
+        }
+        if (response.usage) {
+            trackUsage(model, response.usage.promptTokens, response.usage.completionTokens);
+        }
+    } catch (err) {
+        console.warn('Weekly compression failed (non-critical):', err);
+    }
+}
 
 interface Props {
     profile: UserProfile;
@@ -159,6 +204,12 @@ export default function WeeklyCheckInModal({ profile, onClose }: Props) {
 
             await setTargetTemplates(newTemplateIds);
             await setWeekCheckedIn();
+
+            // Fire-and-forget: compress the just-completed week in the background
+            if (config.apiKey) {
+                compressCompletedWeek(config.apiKey, config.selectedModel, provider, trackUsage, profile);
+                generateAndSaveWeeklyRecap(config.apiKey, config.selectedModel, provider, profile, trackUsage);
+            }
 
             onClose();
         } catch (e: any) {
