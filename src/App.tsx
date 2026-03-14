@@ -27,6 +27,7 @@ const GymProfiles = lazy(() => import('./pages/GymProfiles'));
 const GymEquipment = lazy(() => import('./pages/GymEquipment'));
 const AISettings = lazy(() => import('./pages/AISettings'));
 const Records = lazy(() => import('./pages/Records'));
+const Analytics = lazy(() => import('./pages/Analytics'));
 
 function App() {
   const profile = useLiveQuery(() => getUserProfile().then(p => p || null));
@@ -93,6 +94,7 @@ function App() {
                       <Route path="/gyms/:gymId" element={<GymEquipment />} />
                       <Route path="/settings" element={<AISettings />} />
                       <Route path="/records" element={<Records />} />
+                      <Route path="/analytics" element={<Analytics />} />
                     </Routes>
                   </Suspense>
                 </main>

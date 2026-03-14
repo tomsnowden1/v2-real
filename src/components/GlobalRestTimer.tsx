@@ -8,7 +8,7 @@ function PillRing({ pct, color }: { pct: number; color: string }) {
     const circ = 2 * Math.PI * r;
     const offset = circ * (1 - pct);
     return (
-        <svg className="rest-pill__ring" width="40" height="40" viewBox="0 0 40 40">
+        <svg className="rest-pill__ring" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r={r} fill="none" stroke="var(--color-border)" strokeWidth="3.5" />
             <circle
                 cx="20" cy="20" r={r} fill="none"
@@ -28,7 +28,7 @@ function OverlayRing({ pct, color }: { pct: number; color: string }) {
     const circ = 2 * Math.PI * r;
     const offset = circ * (1 - pct);
     return (
-        <svg width="220" height="220" viewBox="0 0 220 220">
+        <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true">
             <circle cx="110" cy="110" r={r} fill="none" stroke="var(--color-border)" strokeWidth="8" />
             <circle
                 cx="110" cy="110" r={r} fill="none"

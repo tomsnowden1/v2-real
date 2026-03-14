@@ -39,9 +39,9 @@ export default function ConfirmModal({
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" role="dialog" aria-modal="true">
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
             <div className="modal-content confirm-modal">
-                <h3 className="modal-title">{title}</h3>
+                <h3 id="confirm-modal-title" className="modal-title">{title}</h3>
                 <p className="modal-message">{message}</p>
 
                 <div className="modal-actions">

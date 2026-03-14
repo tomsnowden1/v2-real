@@ -4,12 +4,82 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { getUserProfile, saveUserProfile } from '../db/userProfileService';
 import { db } from '../db/database';
 import type { UserProfile } from '../db/database';
-import { Trophy } from 'lucide-react';
+import { Trophy, TrendingUp } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 
 export default function More() {
     const profile = useLiveQuery(() => getUserProfile().then(p => p || null));
     const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [isImporting, setIsImporting] = useState(false);
+    const [importResult, setImportResult] = useState<string | null>(null);
+
+    const handleExportJSON = async () => {
+        const history = await db.workoutHistory.toArray();
+        const templates = await db.templates.toArray();
+        const userProfileData = await getUserProfile();
+        const data = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            workoutHistory: history,
+            templates,
+            profile: userProfileData,
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ironlog-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExportCSV = async () => {
+        const history = await db.workoutHistory.orderBy('startTime').reverse().toArray();
+        const rows: string[] = ['Date,Workout,Duration (min),Exercise,Set,Weight,Reps'];
+        for (const workout of history) {
+            const date = new Date(workout.startTime).toLocaleDateString();
+            const name = `"${workout.name.replace(/"/g, '""')}"`;
+            const duration = Math.round((workout.durationMs || 0) / 60000);
+            for (const ex of workout.exercises || []) {
+                const exName = `"${(ex.exerciseName || ex.exerciseId).replace(/"/g, '""')}"`;
+                ex.sets.forEach((set, idx) => {
+                    rows.push(`${date},${name},${duration},${exName},${idx + 1},${set.weight ?? ''},${set.reps ?? ''}`);
+                });
+            }
+        }
+        const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ironlog-history-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleImportJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsImporting(true);
+        setImportResult(null);
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text) as { workoutHistory?: unknown[]; templates?: unknown[] };
+            if (!data.workoutHistory || !Array.isArray(data.workoutHistory)) {
+                setImportResult('Invalid file — expected an IronLog backup JSON.');
+                return;
+            }
+            await db.workoutHistory.bulkPut(data.workoutHistory as Parameters<typeof db.workoutHistory.bulkPut>[0]);
+            if (data.templates && Array.isArray(data.templates)) {
+                await db.templates.bulkPut(data.templates as Parameters<typeof db.templates.bulkPut>[0]);
+            }
+            setImportResult(`Imported ${data.workoutHistory.length} workouts successfully.`);
+        } catch {
+            setImportResult('Import failed. Make sure the file is a valid IronLog backup.');
+        } finally {
+            setIsImporting(false);
+            e.target.value = '';
+        }
+    };
 
     const handleReset = async () => {
         // Clear all user data from the database (keep exercises — those are the built-in library)
@@ -95,6 +165,16 @@ export default function More() {
                                     <h3 style={{ margin: 0, color: 'var(--color-text-main)', fontSize: '16px' }}>Personal Records</h3>
                                 </div>
                                 <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted)' }}>View your all-time best performances.</p>
+                            </div>
+                        </Link>
+
+                        <Link to="/analytics" style={{ textDecoration: 'none' }}>
+                            <div className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <TrendingUp size={20} color="var(--color-primary)" />
+                                    <h3 style={{ margin: 0, color: 'var(--color-text-main)', fontSize: '16px' }}>Analytics</h3>
+                                </div>
+                                <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted)' }}>Volume trends, workout frequency, and top exercises.</p>
                             </div>
                         </Link>
                     </div>
@@ -264,6 +344,66 @@ export default function More() {
                             </select>
                         </div>
 
+                    </div>
+                </section>
+
+                <section>
+                    <h2 style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Data</h2>
+                    <div className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                            <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: 'var(--color-text-main)' }}>Export</h3>
+                            <p style={{ margin: '0 0 12px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                Download your data as a backup or spreadsheet.
+                            </p>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    onClick={handleExportJSON}
+                                    style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-main)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                                >
+                                    Backup (JSON)
+                                </button>
+                                <button
+                                    onClick={handleExportCSV}
+                                    style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'var(--color-text-main)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                                >
+                                    Spreadsheet (CSV)
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
+                            <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: 'var(--color-text-main)' }}>Import</h3>
+                            <p style={{ margin: '0 0 12px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                Restore workouts and templates from a JSON backup.
+                            </p>
+                            <label
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '9px 16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'var(--color-bg)',
+                                    color: isImporting ? 'var(--color-text-muted)' : 'var(--color-text-main)',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    cursor: isImporting ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                {isImporting ? 'Importing…' : 'Import Backup'}
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={handleImportJSON}
+                                    disabled={isImporting}
+                                    style={{ display: 'none' }}
+                                    aria-label="Import backup JSON file"
+                                />
+                            </label>
+                            {importResult && (
+                                <p style={{ margin: '10px 0 0', fontSize: '12px', color: importResult.includes('success') ? 'var(--color-primary)' : '#ef4444' }}>
+                                    {importResult}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </section>
 

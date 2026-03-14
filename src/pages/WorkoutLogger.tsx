@@ -170,18 +170,22 @@ export default function WorkoutLogger() {
             );
             updateExercises(newExs);
         } else {
-            // It's an Add operation, let's fetch previous data for this exercise ID
+            // It's an Add operation, fetch previous data for this exercise ID
             let previousStr = '-';
+            let autoWeight = 0;
+            let autoReps = 0;
             try {
                 const history = await db.workoutHistory.orderBy('startTime').reverse().limit(5).toArray();
                 for (const hw of history) {
                     const found = hw.exercises.find(e => e.exerciseId === dbEx.id);
                     if (found && found.sets.length > 0) {
-                        // Display the best/heaviest set they did last time
-                        const bestSet = [...found.sets].sort((a, b) => b.weight - a.weight)[0];
-                        if (bestSet && bestSet.weight > 0) {
-                            previousStr = `${bestSet.weight}x${bestSet.reps} `;
-                        } else if (bestSet && bestSet.reps > 0) {
+                        const bestSet = [...found.sets].sort((a, b) => (b.weight || 0) - (a.weight || 0))[0];
+                        if (bestSet && (bestSet.weight || 0) > 0) {
+                            autoWeight = Math.round((bestSet.weight || 0) * weightScaleFactor);
+                            autoReps = bestSet.reps || 0;
+                            previousStr = `${bestSet.weight}x${bestSet.reps}`;
+                        } else if (bestSet && (bestSet.reps || 0) > 0) {
+                            autoReps = bestSet.reps || 0;
                             previousStr = `${bestSet.reps} reps`;
                         }
                         break;
@@ -191,11 +195,23 @@ export default function WorkoutLogger() {
                 console.error("Failed to query history for previous set format", e);
             }
 
+            const newSetBase = {
+                id: `s-${generateId()}`,
+                type: 'normal' as const,
+                isDone: false,
+                previousStr,
+                weight: weightSuggestionUI === 'autofill' ? autoWeight : 0,
+                reps: weightSuggestionUI === 'autofill' ? autoReps : 0,
+                ...(weightSuggestionUI !== 'autofill' && autoWeight > 0
+                    ? { targetWeight: autoWeight, targetReps: autoReps }
+                    : {}),
+            };
+
             const newEx = {
                 id: `we-${generateId()}`,
                 exerciseId: dbEx.id,
                 exerciseName: dbEx.name,
-                sets: [{ id: `s-${generateId()}`, type: 'normal' as const, weight: 0, reps: 0, isDone: false, previousStr }]
+                sets: [newSetBase],
             };
             updateExercises([...exercises, newEx]);
         }

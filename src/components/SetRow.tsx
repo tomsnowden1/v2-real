@@ -80,6 +80,7 @@ export default function SetRow({
                     inputMode="decimal"
                     className="metric-input"
                     placeholder={weightPlaceholder}
+                    aria-label={`Set ${index} weight in ${weightUnit}`}
                     value={weight}
                     onChange={(e) => onWeightChange(e.target.value)}
                     disabled={isDone}
@@ -91,6 +92,7 @@ export default function SetRow({
                     inputMode="numeric"
                     className="metric-input"
                     placeholder={repsPlaceholder}
+                    aria-label={`Set ${index} reps`}
                     value={reps}
                     onChange={(e) => onRepsChange(e.target.value)}
                     disabled={isDone}
@@ -103,6 +105,7 @@ export default function SetRow({
                         inputMode="numeric"
                         className="metric-input"
                         placeholder="RPE"
+                        aria-label={`Set ${index} RPE`}
                         value={rpe}
                         onChange={(e) => onRpeChange?.(e.target.value)}
                         disabled={isDone}

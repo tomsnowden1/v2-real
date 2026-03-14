@@ -1,0 +1,150 @@
+.analytics-page {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.analytics-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.analytics-header h1 {
+    margin: 0;
+    font-size: var(--font-2xl);
+    font-weight: 700;
+}
+
+.analytics-back {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+
+.analytics-back:hover {
+    background: var(--color-border);
+}
+
+.analytics-loading,
+.analytics-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 48px 0;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* ── Stats row ── */
+.analytics-stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.analytics-stat {
+    flex: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.analytics-stat-icon {
+    color: var(--color-primary);
+    margin-bottom: 2px;
+}
+
+.analytics-stat-value {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1;
+}
+
+.analytics-stat-label {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* ── Sections ── */
+.analytics-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.analytics-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 14px;
+}
+
+.analytics-chart {
+    margin: 0 -4px;
+}
+
+/* ── Exercise frequency bars ── */
+.analytics-exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.analytics-exercise-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.analytics-exercise-name {
+    font-size: var(--font-sm);
+    color: var(--color-text-main);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.analytics-exercise-bar-wrap {
+    height: 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.analytics-exercise-bar {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.analytics-exercise-sets {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
