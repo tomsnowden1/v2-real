@@ -12,6 +12,8 @@ interface FinishWorkoutSheetProps {
     templateName?: string;
     hasApiKey: boolean;
     hasChangesFromTemplate: boolean;
+    /** True when exercises were added/removed (not just weights changed). Shows full picker. */
+    hasExerciseChanges: boolean;
     isFinishing: boolean;
     onFinish: (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => void;
     onCancel: () => void;
@@ -25,16 +27,24 @@ export default function FinishWorkoutSheet({
     templateName,
     hasApiKey,
     hasChangesFromTemplate,
+    hasExerciseChanges,
     isFinishing,
     onFinish,
     onCancel
 }: FinishWorkoutSheetProps) {
-    const [templateUpdateMode, setTemplateUpdateMode] = useState<TemplateUpdateMode>('none');
+    // Default: save weights (ON) unless exercises changed (then let user choose)
+    const [templateUpdateMode, setTemplateUpdateMode] = useState<TemplateUpdateMode>('values');
+    const [saveValuesToggle, setSaveValuesToggle] = useState(true);
     const [sendToCoach, setSendToCoach] = useState(hasApiKey);
 
     if (!isOpen) return null;
 
     const isFromTemplate = !!sourceTemplateId;
+
+    // Determine effective update mode
+    const effectiveMode: TemplateUpdateMode = hasExerciseChanges
+        ? templateUpdateMode
+        : (saveValuesToggle ? 'values' : 'none');
 
     return (
         <div className="finish-sheet-overlay" onClick={onCancel}>
@@ -54,46 +64,65 @@ export default function FinishWorkoutSheet({
                             Update Template{templateName ? ` — ${templateName}` : ''}
                         </div>
 
-                        <div className="template-update-options">
-                            <button
-                                className={`template-option ${templateUpdateMode === 'none' ? 'selected' : ''}`}
-                                onClick={() => setTemplateUpdateMode('none')}
-                            >
-                                <div className="template-option-radio">
-                                    <div className="template-option-radio-inner" />
-                                </div>
-                                <div className="template-option-text">
-                                    <h4>Don't update</h4>
-                                    <p>Keep the template as-is</p>
-                                </div>
-                            </button>
+                        {hasExerciseChanges ? (
+                            /* Full 3-option picker — exercises were added/removed */
+                            <div className="template-update-options">
+                                <button
+                                    className={`template-option ${templateUpdateMode === 'none' ? 'selected' : ''}`}
+                                    onClick={() => setTemplateUpdateMode('none')}
+                                >
+                                    <div className="template-option-radio">
+                                        <div className="template-option-radio-inner" />
+                                    </div>
+                                    <div className="template-option-text">
+                                        <h4>Don't update</h4>
+                                        <p>Keep the template as-is</p>
+                                    </div>
+                                </button>
 
-                            <button
-                                className={`template-option ${templateUpdateMode === 'values' ? 'selected' : ''}`}
-                                onClick={() => setTemplateUpdateMode('values')}
-                            >
-                                <div className="template-option-radio">
-                                    <div className="template-option-radio-inner" />
-                                </div>
-                                <div className="template-option-text">
-                                    <h4>Update values</h4>
-                                    <p>Sync today's weights & reps back to the template</p>
-                                </div>
-                            </button>
+                                <button
+                                    className={`template-option ${templateUpdateMode === 'values' ? 'selected' : ''}`}
+                                    onClick={() => setTemplateUpdateMode('values')}
+                                >
+                                    <div className="template-option-radio">
+                                        <div className="template-option-radio-inner" />
+                                    </div>
+                                    <div className="template-option-text">
+                                        <h4>Update values only</h4>
+                                        <p>Sync today's weights & reps, keep original exercises</p>
+                                    </div>
+                                </button>
 
-                            <button
-                                className={`template-option ${templateUpdateMode === 'values_and_exercises' ? 'selected' : ''}`}
-                                onClick={() => setTemplateUpdateMode('values_and_exercises')}
-                            >
-                                <div className="template-option-radio">
-                                    <div className="template-option-radio-inner" />
+                                <button
+                                    className={`template-option ${templateUpdateMode === 'values_and_exercises' ? 'selected' : ''}`}
+                                    onClick={() => setTemplateUpdateMode('values_and_exercises')}
+                                >
+                                    <div className="template-option-radio">
+                                        <div className="template-option-radio-inner" />
+                                    </div>
+                                    <div className="template-option-text">
+                                        <h4>Update everything</h4>
+                                        <p>Replace the template with today's full workout</p>
+                                    </div>
+                                </button>
+                            </div>
+                        ) : (
+                            /* Simple toggle — only weights/reps changed */
+                            <div className="coach-toggle-row">
+                                <div className="coach-toggle-info">
+                                    <h4>Save today's weights?</h4>
+                                    <p>Update the template with today's weights & reps</p>
                                 </div>
-                                <div className="template-option-text">
-                                    <h4>Update values & exercises</h4>
-                                    <p>Replace the template entirely with today's workout</p>
-                                </div>
-                            </button>
-                        </div>
+                                <label className="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={saveValuesToggle}
+                                        onChange={e => setSaveValuesToggle(e.target.checked)}
+                                    />
+                                    <span className="toggle-slider" />
+                                </label>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -134,7 +163,7 @@ export default function FinishWorkoutSheet({
                     <button
                         className="finish-sheet-btn primary"
                         disabled={isFinishing}
-                        onClick={() => onFinish(templateUpdateMode, sendToCoach && hasApiKey)}
+                        onClick={() => onFinish(effectiveMode, sendToCoach && hasApiKey)}
                     >
                         {isFinishing ? 'Saving...' : 'Finish & Save'}
                     </button>

@@ -251,6 +251,111 @@
 
 ---
 
+## Audit: UX Flow (March 2026)
+
+> Found during full UX & Flow Audit on 2026-03-13. Ranked by daily gym experience impact.
+
+### UXF1. Post-Workout Celebration + "What's Next" Screen
+- [x] Create `WorkoutCompleteModal.tsx` — brief overlay after "Finish & Save"
+- [x] Show: workout name, duration, total volume, and what's next
+- [x] If sent to Coach: "Your Coach is reviewing this — tap to see" link
+- [x] If not sent to Coach: "Next up: [template name] on [day]" with link to Home
+- [x] "Done" button to dismiss
+- [x] Replace bare `navigate('/coach')` / `navigate('/')` in `WorkoutLogger.tsx` with showing this modal first
+- **Completed:** 2026-03-13
+- **Why:** Right now finishing a workout is a dead end — the app just jumps to another page with zero feedback. This is the last thing you see after every session. A 2-second celebration makes every workout feel complete.
+- **Files:** `src/pages/WorkoutLogger.tsx`, new `src/components/WorkoutCompleteModal.tsx`, `src/hooks/usePostWorkoutReview.ts`
+- **Effort:** 2-3 hours
+
+### UXF2. Simplify "Finish" Sheet Template Choices
+- [x] Replace 3 radio buttons with one toggle: "Save today's weights to template?" (default ON)
+- [x] Only show full 3-option picker when exercises were actually added/removed during workout
+- [x] Detect "only values changed" vs "exercises were added/removed" in `usePostWorkoutReview.ts`
+- **Completed:** 2026-03-13
+- **Why:** The 3 template-update options are confusing when you're tired at the gym. Most people just want their weights saved for next time.
+- **Files:** `src/components/FinishWorkoutSheet.tsx`, `src/hooks/usePostWorkoutReview.ts`
+- **Effort:** 1-2 hours
+
+### UXF3. Move "Fill from Last" to Top + Auto-Fill New Exercises
+- [x] Move the "Fill from Last" button from bottom of exercise list to just below workout header
+- [ ] When adding a new exercise mid-workout, auto-fill weight/reps from last session (data lookup already exists in `handleReplace`)
+- **Completed (button moved):** 2026-03-13
+- **Why:** "Fill from Last" is one of the most useful features but it's buried at the very bottom where nobody will find it. Entering weights is the most repetitive part of logging.
+- **Files:** `src/pages/WorkoutLogger.tsx` (move button ~line 332, extend `handleReplace` ~line 162), `src/pages/WorkoutLogger.css`
+- **Effort:** 1-2 hours
+
+### UXF4. Add "Next Workout" Card on Dead-End Pages
+- [x] Add "Up next: [template] on [day]" card at bottom of `WorkoutDetail.tsx` with tap-to-start
+- [x] Reuse `nextTemplateToDo` lookup pattern from `Home.tsx`
+- **Completed:** 2026-03-13
+- **Why:** After viewing a past workout, there's no way to jump to today's session. A common gym flow is "check last time's weights → start today" — currently takes 4-5 taps. This makes it 1.
+- **Files:** `src/pages/WorkoutDetail.tsx`, reuse pattern from `src/pages/Home.tsx`
+- **Effort:** 1-2 hours
+
+### UXF5. End-of-Week Celebration + "Plan Next Week" Prompt
+- [x] Detect when all scheduled workouts are completed (all `dayAssignments` with `templateId` also have `completedWorkoutId`)
+- [x] Show celebration banner at top of Home: "Week Complete! You hit all X workouts"
+- [x] Add "Plan Next Week with Coach" button that opens `WeeklyCheckInModal`
+- **Completed:** 2026-03-13
+- **Why:** When you finish all your workouts for the week, nothing happens. The weekly check-in is how Coach adjusts your program, but users skip it because they're never prompted. This catches them at peak satisfaction.
+- **Files:** `src/pages/Home.tsx`, optionally `src/components/WeeklyViewCard.tsx`
+- **Effort:** 1-2 hours
+
+### Bonus Observations (not tasks, just notes)
+- Onboarding is up to 20 steps across two gates — monitor for drop-off with more users
+- Coach Dashboard vs Chat are two views on the same page; transition between them could be smoother later
+- Gym profiles feel disconnected — user sets up equipment but Coach doesn't visibly reference it. Consider "Based on your home gym" note on suggestions later.
+
+---
+
+## Audit: Bug Fixes (March 2026)
+
+> Found during full code scan on 2026-03-13. Sorted by severity.
+
+### BF1. API Proxy Strips `response_format` (CRITICAL)
+- [x] Add `response_format` passthrough to sanitized body in `api/openai/v1/chat/completions.js`
+- **Completed:** 2026-03-13
+
+### BF2. `Array(7).fill()` Creates Shared References (CRITICAL)
+- [x] Replace all 4 instances in `src/db/weeklyPlanService.ts` with `Array.from({ length: 7 }, () => ({ templateId: null }))`
+- **Completed:** 2026-03-13
+
+### BF3. Records Page Hardcodes "lbs" Instead of User's Weight Unit (CRITICAL)
+- [x] Added `getUserProfile` lookup and use `profile?.weightUnit || 'lbs'` in `formatValue`
+- **Completed:** 2026-03-13
+
+### BF4. Coach Roadmap Score Index Goes Negative (MEDIUM)
+- [x] Guard array access with `scoreIdx >= 0` check before indexing `recentScores`
+- **Completed:** 2026-03-13
+
+### BF5. Coach Template Save Can Pass Undefined Values (MEDIUM)
+- [x] Added `.filter(Boolean)` after exercise map in `handleResolveComplete`
+- **Completed:** 2026-03-13
+
+### BF6. GymEquipment Uses `Date.now()` Instead of `generateId()` (MEDIUM)
+- [x] Replaced `Date.now()` with `generateId()` and added import
+- **Completed:** 2026-03-13
+
+### BF7. ExerciseCard Set IDs Missing `s-` Prefix (LOW)
+- [x] Changed `id: generateId()` to `` id: `s-${generateId()}` `` in `addSet`
+- **Completed:** 2026-03-13
+
+### BF8. Home.tsx Score Properties Missing Optional Chaining (LOW)
+- [x] Added optional chaining on `score?.overall`, `score?.consistency`, `score?.progression`, `score?.quality`
+- **Completed:** 2026-03-13
+
+### BF9. JSON.parse Without Specific Error Handling in AI Adapters (LOW)
+- [x] Wrapped `JSON.parse()` in dedicated try-catch with log of raw content in both openaiAdapter.ts and alternativeProviders.ts
+- **Completed:** 2026-03-13
+
+### BF10. Review Orchestrator Reads Cleared localStorage (KNOWN LIMITATION)
+- [x] Added `sourceTemplateId?: string` to `WorkoutHistory` interface in `database.ts`
+- [x] `WorkoutContext.finishWorkout()` now persists `sourceTemplateId` into the history record
+- [x] `reviewOrchestrator.ts` now reads `sourceTemplateId` directly from the workout record — localStorage fallback removed
+- **Completed:** 2026-03-13
+
+---
+
 ## Audit: Visual Polish
 
 > Consistency and error handling improvements.
@@ -579,4 +684,20 @@
   - `WorkoutDetail.tsx`: Added "Save as Template" button + ConfirmModal; saves past workout as a reusable template and navigates to /templates
   - `WorkoutDetail.css`: Added `.wd-save-template-btn` blue outline style
   - Build verified: no TypeScript errors
+  - All 91 tests pass
+
+
+### 2026-03-13
+- **BF1-BF10 Complete**: Full codebase bug fix pass (10 bugs fixed)
+  - BF1: API proxy now forwards `response_format` to OpenAI (was causing JSON parse failures in AI features)
+  - BF2: Fixed `Array(7).fill()` shared-reference bug in weeklyPlanService — all 4 locations replaced with `Array.from()`
+  - BF3: Records page now uses user's weight unit (lbs/kg) instead of hardcoded 'lbs'
+  - BF4: Coach 6-week roadmap score lookup guarded against negative array index
+  - BF5: Coach template save filtered to remove undefined exercise entries
+  - BF6: GymEquipment custom IDs now use `generateId()` instead of `Date.now()`
+  - BF7: ExerciseCard `addSet` IDs now include `s-` prefix for consistency
+  - BF8: Home score properties use optional chaining (`score?.overall` etc.)
+  - BF9: JSON.parse in AI adapters wrapped in try-catch with helpful error logging
+  - BF10: `sourceTemplateId` now stored in WorkoutHistory — review orchestrator no longer relies on localStorage race condition
+  - Build verified: zero TypeScript errors
   - All 91 tests pass

@@ -416,7 +416,7 @@ export default function Coach() {
             applySuggestion(suggestion, finalMap);
             navigate('/workout');
         } else {
-            const resolvedList = suggestion.exercises.map(ex => finalMap[ex.name]);
+            const resolvedList = suggestion.exercises.map(ex => finalMap[ex.name]).filter(Boolean);
             await proceedSaveTemplate(suggestion, resolvedList);
         }
     };
@@ -502,8 +502,9 @@ export default function Coach() {
                             {[1, 2, 3, 4, 5, 6].map(w => {
                                 const isPast = w < currentBlockWeek;
                                 const isCurrent = w === currentBlockWeek;
-                                const score = recentScores && recentScores.length > 0
-                                    ? recentScores[currentBlockWeek - w]
+                                const scoreIdx = currentBlockWeek - w;
+                                const score = recentScores && recentScores.length > 0 && scoreIdx >= 0
+                                    ? recentScores[scoreIdx]
                                     : undefined;
                                 return (
                                     <div key={w} className="coach-dash-week-col">

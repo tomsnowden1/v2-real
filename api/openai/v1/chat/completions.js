@@ -72,6 +72,11 @@ export default async function handler(req, res) {
         sanitizedBody.max_tokens = body.max_tokens;
     }
 
+    // Pass through response_format (required for JSON mode)
+    if (body.response_format) {
+        sanitizedBody.response_format = body.response_format;
+    }
+
     try {
         const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',

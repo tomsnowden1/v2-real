@@ -156,7 +156,7 @@ export default function ExerciseCard({
     const addSet = () => {
         const lastSet = sets[sets.length - 1];
         const newSet: ExerciseSet = {
-            id: generateId(),
+            id: `s-${generateId()}`,
             type: 'normal',
             weight: lastSet ? lastSet.weight : '',
             reps: lastSet ? lastSet.reps : '',

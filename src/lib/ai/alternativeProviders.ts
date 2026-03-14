@@ -395,7 +395,13 @@ export const anthropicProvider: AIProvider = {
             const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
             if (!text) return { data: null };
 
-            const parsed = JSON.parse(text) as PostWorkoutReview;
+            let parsed: PostWorkoutReview;
+            try {
+                parsed = JSON.parse(text) as PostWorkoutReview;
+            } catch {
+                console.error('Anthropic Provider: Failed to parse review JSON. Raw content:', text.slice(0, 200));
+                return { data: null };
+            }
             return {
                 data: parsed,
                 usage: {

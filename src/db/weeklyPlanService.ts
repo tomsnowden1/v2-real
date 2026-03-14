@@ -30,7 +30,7 @@ export async function getCurrentWeeklyPlan(): Promise<WeeklyPlan> {
         id,
         weekStartDate: getStartOfWeek().getTime(),
         targetTemplateIds: [],
-        dayAssignments: Array(7).fill({ templateId: null }),
+        dayAssignments: Array.from({ length: 7 }, () => ({ templateId: null })),
         completedWorkouts: [],
         hasCheckedIn: false
     };
@@ -46,7 +46,7 @@ export async function setTargetTemplates(templateIds: string[]): Promise<void> {
 
 export async function assignTemplateToDay(dayIndex: number, templateId: string | null): Promise<void> {
     const plan = await getCurrentWeeklyPlan();
-    const newAssignments = [...(plan.dayAssignments || Array(7).fill({ templateId: null }))];
+    const newAssignments = [...(plan.dayAssignments || Array.from({ length: 7 }, () => ({ templateId: null })))];
     newAssignments[dayIndex] = { ...newAssignments[dayIndex], templateId };
     await db.weeklyPlans.update(plan.id, { dayAssignments: newAssignments });
 }
@@ -61,7 +61,7 @@ export async function addCompletedWorkoutToWeek(workoutId: string): Promise<void
 
     // Try to map to today's day (0-6)
     const todayIndex = (new Date().getDay() + 6) % 7;
-    const currentAssignments = plan.dayAssignments || Array(7).fill({ templateId: null });
+    const currentAssignments = plan.dayAssignments || Array.from({ length: 7 }, () => ({ templateId: null }));
 
     // If today had a template, mark it done.
     if (currentAssignments[todayIndex].templateId && !currentAssignments[todayIndex].completedWorkoutId) {
@@ -77,7 +77,7 @@ export async function addCompletedWorkoutToWeek(workoutId: string): Promise<void
 
 export async function markDayCompleted(dayIndex: number, workoutId: string): Promise<void> {
     const plan = await getCurrentWeeklyPlan();
-    const newAssignments = [...(plan.dayAssignments || Array(7).fill({ templateId: null }))];
+    const newAssignments = [...(plan.dayAssignments || Array.from({ length: 7 }, () => ({ templateId: null })))];
     newAssignments[dayIndex] = { ...newAssignments[dayIndex], completedWorkoutId: workoutId };
     await db.weeklyPlans.update(plan.id, { dayAssignments: newAssignments });
 }

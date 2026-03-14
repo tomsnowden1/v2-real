@@ -149,7 +149,8 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
             startTime,
             endTime,
             durationMs,
-            exercises
+            exercises,
+            ...(sourceTemplateId ? { sourceTemplateId } : {}),
         };
 
         const profile = await getUserProfile();

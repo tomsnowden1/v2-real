@@ -18,6 +18,8 @@ interface UsePostWorkoutReviewOptions {
 
 interface UsePostWorkoutReviewReturn {
     hasChangesFromTemplate: boolean;
+    /** True only when exercises were added or removed (not just weights/reps changed). */
+    hasExerciseChanges: boolean;
     templateName: string | undefined;
     /**
      * Saves the workout, optionally enqueues a Coach review, returns whether
@@ -40,12 +42,18 @@ export function usePostWorkoutReview({
         [sourceTemplateId]
     );
 
-    // Detect whether the user changed exercises/values from the template
-    const hasChangesFromTemplate = useMemo(() => {
+    // Detect whether exercises were added or removed from the template
+    const hasExerciseChanges = useMemo(() => {
         if (!sourceTemplate) return false;
         const tplExIds = sourceTemplate.exercises.map(e => e.exerciseId).sort().join(',');
         const wkExIds = exercises.map(e => e.exerciseId).sort().join(',');
-        if (tplExIds !== wkExIds) return true;
+        return tplExIds !== wkExIds;
+    }, [sourceTemplate, exercises]);
+
+    // Detect whether the user changed exercises/values from the template
+    const hasChangesFromTemplate = useMemo(() => {
+        if (!sourceTemplate) return false;
+        if (hasExerciseChanges) return true;
         for (const ex of exercises) {
             const tplEx = sourceTemplate.exercises.find(e => e.exerciseId === ex.exerciseId);
             if (!tplEx) return true;
@@ -55,7 +63,7 @@ export function usePostWorkoutReview({
             }
         }
         return false;
-    }, [sourceTemplate, exercises]);
+    }, [sourceTemplate, exercises, hasExerciseChanges]);
 
     const handleFinish = async (
         templateUpdateMode: TemplateUpdateMode,
@@ -134,6 +142,7 @@ export function usePostWorkoutReview({
 
     return {
         hasChangesFromTemplate,
+        hasExerciseChanges,
         templateName: sourceTemplate?.name,
         handleFinish,
     };

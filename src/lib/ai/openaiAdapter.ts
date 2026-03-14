@@ -420,7 +420,13 @@ Rules:
             const content = completion.choices[0]?.message?.content;
             if (!content) return { data: null };
 
-            const parsed = JSON.parse(content) as PostWorkoutReview;
+            let parsed: PostWorkoutReview;
+            try {
+                parsed = JSON.parse(content) as PostWorkoutReview;
+            } catch {
+                console.error('OpenAI Adapter: Failed to parse review JSON. Raw content:', content.slice(0, 200));
+                return { data: null };
+            }
             return {
                 data: parsed,
                 usage: {

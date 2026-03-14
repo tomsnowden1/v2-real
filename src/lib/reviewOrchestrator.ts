@@ -41,20 +41,9 @@ export async function runReviewForWorkout(
         // Previous sessions for trend comparison (skip the workout we just finished)
         const prevWorkouts = allHistory.filter(w => w.id !== workoutId).slice(0, 6);
 
-        // Source template (for plan adherence)
-        const sourceTemplateId = await db.workoutHistory.get(workoutId).then(async _w => {
-            // WorkoutContext doesn't persist sourceTemplateId in history yet.
-            // We look it up from localStorage (still there briefly during finish flow).
-            // Fallback: undefined — AI will skip adherence analysis.
-            try {
-                const active = localStorage.getItem('ironai_active_workout');
-                if (active) {
-                    const parsed = JSON.parse(active);
-                    return parsed.sourceTemplateId as string | null;
-                }
-            } catch { /* ignore */ }
-            return null;
-        });
+        // Source template (for plan adherence) — stored directly on the workout record
+        const workoutRecord = await db.workoutHistory.get(workoutId);
+        const sourceTemplateId = workoutRecord?.sourceTemplateId ?? null;
 
         const sourceTemplate = sourceTemplateId
             ? await db.templates.get(sourceTemplateId) ?? null

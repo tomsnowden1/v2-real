@@ -289,6 +289,49 @@
     color: var(--color-error);
 }
 
+/* ── Next Workout Card ───────────────────────────────────────────── */
+.wd-next-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-subtle);
+    border: 1px solid var(--color-primary);
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.wd-next-card:hover {
+    opacity: 0.85;
+}
+
+.wd-next-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wd-next-label {
+    font-size: var(--font-xs);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: var(--fw-semibold);
+}
+
+.wd-next-name {
+    font-size: var(--font-base);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text-main);
+}
+
+.wd-next-chevron {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
 /* ── Repeat Button ───────────────────────────────────────────────── */
 .wd-repeat-btn {
     display: flex;

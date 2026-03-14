@@ -46,6 +46,7 @@ export interface WorkoutHistory {
     durationMs: number;
     exercises: WorkoutExercise[];
     gymId?: string; // used later for Gym Profiles
+    sourceTemplateId?: string; // template used to start this workout (for AI review adherence)
     score?: {
         overall: number;
         consistency: number;

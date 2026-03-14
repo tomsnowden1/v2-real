@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import { getUserProfile } from '../db/userProfileService';
+import { getCurrentWeeklyPlan } from '../db/weeklyPlanService';
 import { useWorkout } from '../context/WorkoutContext';
 import { generateId } from '../lib/id';
 import { saveAsTemplate } from '../db/templateService';
-import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2, Play, Bookmark } from 'lucide-react';
+import { ArrowLeft, Clock, Dumbbell, Calendar, Trash2, Play, Bookmark, ChevronRight } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ScoreRing from '../components/ScoreRing';
 import './WorkoutDetail.css';
@@ -25,6 +26,21 @@ export default function WorkoutDetail() {
 
     const userProfile = useLiveQuery(() => getUserProfile());
     const weightUnit = userProfile?.weightUnit ?? 'lbs';
+
+    // Find next scheduled workout this week
+    const nextWorkout = useLiveQuery(async () => {
+        const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const plan = await getCurrentWeeklyPlan();
+        const todayIndex = (new Date().getDay() + 6) % 7;
+        for (let i = todayIndex + 1; i < 7; i++) {
+            const a = plan.dayAssignments[i];
+            if (a?.templateId && !a.completedWorkoutId) {
+                const tpl = await db.templates.get(a.templateId);
+                if (tpl) return { name: tpl.name, day: DAY_NAMES[i], templateId: tpl.id, template: tpl };
+            }
+        }
+        return null;
+    });
 
     // ── helpers ──────────────────────────────────────────────────────
     const formatDate = (timestamp?: number) => {
@@ -222,6 +238,30 @@ export default function WorkoutDetail() {
                         </div>
                     </div>
                 ))}
+
+                {/* ── Next Workout Card ───────────────────────────────── */}
+                {nextWorkout && (
+                    <div
+                        className="wd-next-card"
+                        onClick={() => {
+                            if (isActive) {
+                                if (!window.confirm('You have an active workout. Replace it?')) return;
+                            }
+                            startWorkout(nextWorkout.name);
+                            updateExercises(nextWorkout.template.exercises.map(ex => ({
+                                ...ex,
+                                id: `we-${generateId()}`,
+                            })));
+                            navigate('/workout');
+                        }}
+                    >
+                        <div className="wd-next-info">
+                            <span className="wd-next-label">Up next — {nextWorkout.day}</span>
+                            <span className="wd-next-name">{nextWorkout.name}</span>
+                        </div>
+                        <ChevronRight size={20} className="wd-next-chevron" />
+                    </div>
+                )}
 
                 {/* ── Action Buttons ──────────────────────────────────── */}
                 <button className="wd-repeat-btn" onClick={handleRepeat}>

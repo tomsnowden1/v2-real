@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getGymById, updateGym, addCustomEquipment, removeCustomEquipment } from '../db/gymService';
+import { generateId } from '../lib/id';
 import { ChevronLeft, Check, Search, Plus, X, Trash2 } from 'lucide-react';
 import './GymEquipment.css';
 
@@ -45,7 +46,7 @@ export default function GymEquipment() {
         if (!trimmed) { setAddError('Please enter a name.'); return; }
         if (!gymId) return;
 
-        const id = `custom-${gymId}-${Date.now()}`;
+        const id = `custom-${gymId}-${generateId()}`;
         await addCustomEquipment(gymId, {
             id,
             name: trimmed,

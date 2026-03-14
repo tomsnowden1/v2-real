@@ -9,8 +9,10 @@ import ExerciseCard from '../components/ExerciseCard';
 import ReplaceModal from '../components/ReplaceModal';
 import ConfirmModal from '../components/ConfirmModal';
 import FinishWorkoutSheet, { type TemplateUpdateMode } from '../components/FinishWorkoutSheet';
+import WorkoutCompleteModal from '../components/WorkoutCompleteModal';
 import { saveAsTemplate } from '../db/templateService';
 import { db } from '../db/database';
+import { getCurrentWeeklyPlan } from '../db/weeklyPlanService';
 import { getUserProfile } from '../db/userProfileService';
 import { findOrCreateExerciseByName } from '../db/exerciseService';
 import { generateId } from '../lib/id';
@@ -41,6 +43,7 @@ export default function WorkoutLogger() {
     const elapsedStr = useWorkoutTimer(isActive, startTime);
     const {
         hasChangesFromTemplate,
+        hasExerciseChanges,
         templateName,
         handleFinish,
     } = usePostWorkoutReview({ exercises, sourceTemplateId, config, provider, finishWorkout });
@@ -91,6 +94,14 @@ export default function WorkoutLogger() {
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isFinishing, setIsFinishing] = useState(false);
 
+    // Post-workout celebration modal state
+    const [completeModalOpen, setCompleteModalOpen] = useState(false);
+    const [completeGoToCoach, setCompleteGoToCoach] = useState(false);
+    const [completeNextTemplate, setCompleteNextTemplate] = useState<{ name: string; day: string } | undefined>(undefined);
+    const [completeDurationStr, setCompleteDurationStr] = useState('');
+    const [completeTotalVolume, setCompleteTotalVolume] = useState(0);
+    const [completeWorkoutName, setCompleteWorkoutName] = useState('');
+
     const handleSupersetUnlink = (sourceExId: string) => {
         const sourceEx = exercises.find(e => e.id === sourceExId);
         const groupId = sourceEx?.supersetId;
@@ -104,8 +115,8 @@ export default function WorkoutLogger() {
         updateExercises(newExs);
     };
 
-    // Handle Empty State (No active workout)
-    if (!isActive || !startTime) {
+    // Handle Empty State (No active workout) — but keep rendering if completion modal is open
+    if ((!isActive || !startTime) && !completeModalOpen) {
         return (
             <div className="page-content empty-state">
                 <Dumbbell size={64} color="var(--color-border)" className="empty-state-icon" />
@@ -253,6 +264,19 @@ export default function WorkoutLogger() {
             </header>
 
             <div className="workout-body">
+                {exercises.length > 0 && (
+                    <div className="workout-fill-row">
+                        <button
+                            className="fill-from-last-top-btn"
+                            onClick={handleFillFromLastSession}
+                            title="Fill empty weights from your last workout"
+                        >
+                            <Copy size={15} />
+                            Fill from Last
+                        </button>
+                    </div>
+                )}
+
                 {exercises.length === 0 ? (
                     <div className="exercises-empty">
                         No exercises yet. Click below to add one.
@@ -330,14 +354,6 @@ export default function WorkoutLogger() {
 
                 <div className="exercises-list-controls">
                     <button
-                        className="add-exercise-btn fill-from-last-btn"
-                        onClick={handleFillFromLastSession}
-                        title="Fill empty weights from your last workout"
-                    >
-                        <Copy size={20} />
-                        Fill from Last
-                    </button>
-                    <button
                         className="add-exercise-btn save-template-btn"
                         onClick={() => setIsTemplateModalOpen(true)}
                     >
@@ -414,10 +430,18 @@ export default function WorkoutLogger() {
                 templateName={templateName}
                 hasApiKey={!!config.apiKey}
                 hasChangesFromTemplate={hasChangesFromTemplate}
+                hasExerciseChanges={hasExerciseChanges}
                 isFinishing={isFinishing}
                 onFinish={async (templateUpdateMode: TemplateUpdateMode, sendToCoach: boolean) => {
                     setIsFinishing(true);
                     try {
+                        // Capture name/duration/volume before finishing (clears context)
+                        const capturedName = workoutName;
+                        const capturedDuration = elapsedStr;
+                        const capturedVolume = exercises.reduce((total, ex) =>
+                            total + ex.sets.reduce((s, set) =>
+                                set.isDone ? s + (set.weight || 0) * (set.reps || 0) : s, 0), 0);
+
                         const result = await handleFinish(templateUpdateMode, sendToCoach);
 
                         if (result.error) {
@@ -425,8 +449,33 @@ export default function WorkoutLogger() {
                             return;
                         }
 
+                        // Find next template if not going to coach
+                        let nextTpl: { name: string; day: string } | undefined;
+                        if (!result.goToCoach) {
+                            try {
+                                const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                                const plan = await getCurrentWeeklyPlan();
+                                const todayIndex = (new Date().getDay() + 6) % 7;
+                                for (let i = todayIndex + 1; i < 7; i++) {
+                                    const a = plan.dayAssignments[i];
+                                    if (a?.templateId && !a.completedWorkoutId) {
+                                        const tpl = await db.templates.get(a.templateId);
+                                        if (tpl) {
+                                            nextTpl = { name: tpl.name, day: DAY_NAMES[i] };
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch { /* non-critical */ }
+                        }
+
                         setIsFinishSheetOpen(false);
-                        navigate(result.goToCoach ? '/coach' : '/');
+                        setCompleteWorkoutName(capturedName);
+                        setCompleteGoToCoach(result.goToCoach);
+                        setCompleteNextTemplate(nextTpl);
+                        setCompleteDurationStr(capturedDuration);
+                        setCompleteTotalVolume(capturedVolume);
+                        setCompleteModalOpen(true);
                     } catch (error) {
                         const message = error instanceof Error ? error.message : 'Unknown error';
                         showErrorToast(`Save failed: ${message}`);
@@ -462,6 +511,21 @@ export default function WorkoutLogger() {
                     alert("Template saved!");
                 }}
                 onCancel={() => setIsTemplateModalOpen(false)}
+            />
+
+            <WorkoutCompleteModal
+                isOpen={completeModalOpen}
+                workoutName={completeWorkoutName}
+                durationStr={completeDurationStr}
+                totalVolume={completeTotalVolume}
+                weightUnit={weightUnit}
+                goToCoach={completeGoToCoach}
+                nextTemplateName={completeNextTemplate?.name}
+                nextTemplateDay={completeNextTemplate?.day}
+                onDone={() => {
+                    setCompleteModalOpen(false);
+                    navigate(completeGoToCoach ? '/coach' : '/');
+                }}
             />
 
             {errorToast && (

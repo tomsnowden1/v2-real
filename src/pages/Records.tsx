@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getPRsGroupedByExercise } from '../db/prService';
 import { db } from '../db/database';
+import { getUserProfile } from '../db/userProfileService';
 import { Trophy, Calendar } from 'lucide-react';
 import Spinner from '../components/Spinner';
 import EmptyState from '../components/EmptyState';
@@ -9,16 +10,18 @@ import './Records.css';
 export default function Records() {
     const groupedPRs = useLiveQuery(() => getPRsGroupedByExercise());
     const exercises = useLiveQuery(() => db.exercises.toArray());
+    const profile = useLiveQuery(() => getUserProfile());
 
     if (!groupedPRs || !exercises) {
         return <Spinner label="Loading records..." />;
     }
 
     const exerciseMap = new Map(exercises.map(ex => [ex.id, ex.name]));
+    const weightUnit = profile?.weightUnit || 'lbs';
 
     const formatValue = (metric: string, value: number) => {
         if (metric === 'Max Reps') return `${value} reps`;
-        return `${value} lbs`;
+        return `${value} ${weightUnit}`;
     };
 
     return (

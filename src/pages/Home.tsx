@@ -5,7 +5,7 @@ import { getCurrentWeeklyPlan, getCurrentWeekId, calculateWeeklyScore, applyShif
 import { db } from '../db/database';
 import { useWorkout } from '../context/WorkoutContext';
 import { generateId } from '../lib/id';
-import { Play, Bookmark, Dumbbell, Sparkles } from 'lucide-react';
+import { Play, Bookmark, Dumbbell, Sparkles, Trophy } from 'lucide-react';
 import AdjustWeekModal from '../components/AdjustWeekModal';
 import WeeklyCheckInModal from '../components/WeeklyCheckInModal';
 import WeeklyViewCard from '../components/WeeklyViewCard';
@@ -88,6 +88,10 @@ export default function Home() {
         }
     }
 
+    // Detect if all scheduled workouts are done this week
+    const scheduledDays = dayAssignments.filter(d => d.templateId !== null);
+    const isWeekComplete = scheduledDays.length > 0 && scheduledDays.every(d => !!d.completedWorkoutId);
+
     return (
         <div className="page-content home-page">
             <header className="home-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -95,25 +99,46 @@ export default function Home() {
             </header>
 
             <div className="home-content">
+                {isWeekComplete && (
+                    <div className="week-complete-banner">
+                        <div className="week-complete-left">
+                            <Trophy size={20} className="week-complete-trophy" />
+                            <div>
+                                <p className="week-complete-title">Week Complete!</p>
+                                <p className="week-complete-subtitle">
+                                    You hit all {scheduledDays.length} workout{scheduledDays.length > 1 ? 's' : ''} this week.
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            className="week-complete-btn"
+                            onClick={() => setIsCheckInModalOpen(true)}
+                        >
+                            <Sparkles size={14} />
+                            Plan Next Week
+                        </button>
+                    </div>
+                )}
+
                 {lastWorkout && lastWorkout.score && (
                     <section className="score-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px', padding: '24px', backgroundColor: 'var(--color-surface)', borderRadius: '16px', border: '1px solid var(--color-border)' }}>
                         <h2 style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <Dumbbell size={16} /> Last Session
                         </h2>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                            <ScoreRing score={lastWorkout.score.overall} size={100} strokeWidth={10} label="Score" />
+                            <ScoreRing score={lastWorkout.score?.overall ?? 0} size={100} strokeWidth={10} label="Score" />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <div style={{ fontSize: '13px', color: 'var(--color-text-main)', display: 'flex', justifyContent: 'space-between', width: '120px' }}>
                                     <span style={{ color: 'var(--color-text-muted)' }}>Progression</span>
-                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score.progression}</span>
+                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score?.progression}</span>
                                 </div>
                                 <div style={{ fontSize: '13px', color: 'var(--color-text-main)', display: 'flex', justifyContent: 'space-between', width: '120px' }}>
                                     <span style={{ color: 'var(--color-text-muted)' }}>Consistency</span>
-                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score.consistency}</span>
+                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score?.consistency}</span>
                                 </div>
                                 <div style={{ fontSize: '13px', color: 'var(--color-text-main)', display: 'flex', justifyContent: 'space-between', width: '120px' }}>
                                     <span style={{ color: 'var(--color-text-muted)' }}>Quality</span>
-                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score.quality}</span>
+                                    <span style={{ fontWeight: 600 }}>{lastWorkout.score?.quality}</span>
                                 </div>
                             </div>
                         </div>
@@ -172,6 +197,13 @@ export default function Home() {
                             </span>
                             <span style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>/100</span>
                         </div>
+                    </section>
+                )}
+
+                {plan.aiRecap && (
+                    <section className="coach-note-card">
+                        <p className="coach-note-label">Coach's Note</p>
+                        <p className="coach-note-text">{plan.aiRecap}</p>
                     </section>
                 )}
 

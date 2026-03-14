@@ -24,6 +24,63 @@
     gap: 32px;
 }
 
+/* Week Complete Banner */
+.week-complete-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+    border: 1px solid #f59e0b;
+}
+
+.week-complete-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.week-complete-trophy {
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+.week-complete-title {
+    font-size: var(--font-sm);
+    font-weight: var(--fw-bold);
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.week-complete-subtitle {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    margin: 2px 0 0;
+}
+
+.week-complete-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: #f59e0b;
+    color: #fff;
+    font-size: var(--font-xs);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+
+.week-complete-btn:hover {
+    opacity: 0.85;
+}
+
 /* Checklist Section */
 .checklist-section {
     background-color: var(--color-surface);
@@ -129,6 +186,30 @@
 .start-workout-btn:active {
     transform: scale(0.98);
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+/* ── Coach's Note Card ───────────────────────────────────────────────────────── */
+.coach-note-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+}
+
+.coach-note-label {
+    margin: 0 0 6px 0;
+    font-size: 11px;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+}
+
+.coach-note-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--color-text-main);
 }
 
 /* ── Template Confirmation Overlay ──────────────────────────────────────────── */
