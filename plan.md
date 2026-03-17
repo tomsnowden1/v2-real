@@ -1,7 +1,7 @@
 # IronAI — Improvement Plan
 
 > Living document. Add ideas freely. Claude reads this at session start to pick up where we left off.
-> Last updated: 2026-03-07
+> Last updated: 2026-03-14
 
 ---
 
@@ -386,6 +386,122 @@
 
 ---
 
+## Opus UX Audit — Quick Fixes (March 2026)
+
+> Found during full end-to-end UX audit on 2026-03-14. Each fix is under 1 hour. Ranked by user impact.
+
+### QF1. Fix kg/lbs Bug in History and ExerciseDetails
+- [ ] `History.tsx` line ~105: `{volume} kg Volume` → use `profile?.weightUnit ?? 'lbs'`
+- [ ] `ExerciseDetails.tsx`: PR value display hardcodes "kg" — use user's weight unit instead
+- **Why:** Every history card shows the wrong unit for lbs users. Factually wrong on every screen.
+- **Files:** `src/pages/History.tsx`, `src/pages/ExerciseDetails.tsx`
+- **Effort:** 30 min
+
+### QF2. Remove Dead "⋮" Button from ExerciseCard
+- [ ] The MoreVertical (3-dot) button renders on every exercise card but `onOptionsClick` is never passed in WorkoutLogger — it receives taps and does nothing
+- [ ] Either remove the button entirely, or don't render it when `onOptionsClick` is undefined
+- **Why:** Users tap it expecting a menu and get silence — every single workout.
+- **Files:** `src/components/ExerciseCard.tsx`
+- **Effort:** 15 min
+
+### QF3. Allow Removing an Exercise from a Live Workout
+- [ ] The trash icon only appears when `onRemoveClick` is passed — WorkoutLogger never passes it
+- [ ] Add `handleRemoveExercise(exerciseId)` to WorkoutLogger and pass it as `onRemoveClick`
+- **Why:** Users can't remove an exercise they've added mid-workout. Only escape is swap or cancel everything.
+- **Files:** `src/pages/WorkoutLogger.tsx`, `src/components/ExerciseCard.tsx`
+- **Effort:** 30 min
+
+### QF4. Add Confirmation Before Clearing Coach Chat
+- [ ] The trash icon in Coach clears the entire chat (including all workout reviews) with one tap — no warning
+- [ ] Add a `ConfirmModal` with message: "This will permanently delete your Coach chat and all workout reviews. This cannot be undone."
+- **Why:** One accidental tap destroys irreplaceable workout review history.
+- **Files:** `src/pages/Coach.tsx`
+- **Effort:** 20 min
+
+### QF5. Hide "+ Custom" Button and "Watch Demo" Video Placeholder
+- [ ] `ExerciseLibrary.tsx`: The "+ Custom" button shows a toast "coming soon" — better to just hide it until built
+- [ ] `ExerciseDetails.tsx`: "Watch Demo" / PlayCircle button links nowhere — remove or hide it
+- **Why:** Fake buttons that do nothing erode trust in the product.
+- **Files:** `src/pages/ExerciseLibrary.tsx`, `src/pages/ExerciseDetails.tsx`
+- **Effort:** 15 min
+
+### QF6. Replace All `window.confirm()` Calls with ConfirmModal
+- [ ] `Templates.tsx` — "Replace active workout?" uses native browser alert
+- [ ] `TemplateDetail.tsx` — same issue
+- [ ] `WorkoutDetail.tsx` — same issue (2 places: repeat + delete)
+- **Why:** Native browser alert looks completely out of place in the polished app UI. 4 occurrences.
+- **Files:** `src/pages/Templates.tsx`, `src/pages/TemplateDetail.tsx`, `src/pages/WorkoutDetail.tsx`
+- **Effort:** 45 min
+
+### QF7. Add Toast Confirmation After "Fill from Last" Button
+- [ ] After tapping "Fill from Last", weights update silently — user has no feedback
+- [ ] Show a brief toast: "Weights filled from your last session"
+- **Why:** Without feedback, users don't know if the button worked.
+- **Files:** `src/pages/WorkoutLogger.tsx`
+- **Effort:** 15 min
+
+---
+
+## Opus UX Audit — Bigger Bets (March 2026)
+
+> Larger improvements worth planning. High user impact but each takes more than a day.
+
+### BB1. Slim Down Onboarding to 5–7 Steps
+- [ ] Current flow: GoalSelectionGuard (9 steps) + ArchitectIntakeWizard (up to 11 steps) = 17–21 steps total
+- [ ] Minimum to get started: goal, experience, weight unit, coach style — everything else asked later
+- [ ] Spread Architect questions across first week of use ("progressive profiling")
+- [ ] Remove the "Soon: BYO API Key" feature card from the welcome tour (advertises unbuilt feature)
+- [ ] Remove the "skip (dev)" button — it's visible to all users
+- **Why:** For a gym app, 20 steps before logging a single set is a massive activation barrier.
+- **Files:** `src/components/GoalSelectionGuard.tsx`, `src/components/wizard/ArchitectIntakeWizard.tsx`
+- **Effort:** 2–3 days
+
+### BB2. Redesign Home Screen Hierarchy
+- [ ] One dominant CTA: today's workout card — big, tappable, most important thing
+- [ ] Remove "Plan with AI Coach" green button from home — it belongs only in the Coach tab
+- [ ] Collapse week score + coach note into a single small card (not two separate sections)
+- [ ] Horizontal scrollable template strip instead of full vertical list at the bottom
+- [ ] "This Week" title and WeeklyViewCard title both say "This Week" — remove the page-level duplicate
+- **Why:** Two competing primary CTAs + 6 stacked sections = decision paralysis on every open.
+- **Files:** `src/pages/Home.tsx`, `src/pages/Home.css`
+- **Effort:** 1–2 days
+
+### BB3. Add "Edit Profile" in Settings
+- [ ] Currently the only way to change goal, coach persona, experience level is "Reset & Start Over"
+- [ ] Add an "Edit Profile" screen accessible from More that writes to the userProfile record
+- [ ] Reuse the existing wizard step UI for each setting
+- **Why:** Users who change goals are completely stuck without a destructive full reset.
+- **Files:** `src/pages/More.tsx`, new `src/pages/EditProfile.tsx`, `src/db/database.ts`
+- **Effort:** 1 day
+
+### BB4. Elevate Records and Analytics in Navigation
+- [ ] Consider replacing the "More" bottom nav slot with "Records" (trophy icon)
+- [ ] Move Analytics into the History tab as a second tab (History already has a "Trends" sub-tab)
+- [ ] More becomes purely a settings overflow (not a destination for core features)
+- **Why:** Records and Analytics are core features buried 2 taps deep under More.
+- **Files:** `src/App.tsx`, `src/components/BottomNav.tsx`, `src/pages/History.tsx`
+- **Effort:** 1 day
+
+### BB5. Full Exercise Interaction Polish
+- [ ] Add ability to change set type (warmup/normal/drop/failure) during a live workout via tap on set badge
+- [ ] Add a per-exercise notes field for form cues or pain points mid-session
+- [ ] "Repeat This Workout" in WorkoutDetail currently resets all weights to 0 — should keep last weights or auto-fill
+- [ ] Exercise variations in ExerciseDetails (progressions/regressions) look tappable but do nothing — wire them up
+- **Why:** Power users hit these gaps quickly. Set types are already in the schema but not editable in-workout.
+- **Files:** `src/components/SetRow.tsx`, `src/components/ExerciseCard.tsx`, `src/pages/ExerciseDetails.tsx`, `src/pages/WorkoutDetail.tsx`
+- **Effort:** 2–3 days
+
+### BB6. Build Custom Exercise Feature
+- [ ] The schema already has `isCustom` flag and `aliases` array on Exercise
+- [ ] Add a form (name, body part, category, optional notes) triggered from ExerciseLibrary "+ Custom" button
+- [ ] Save to `db.exercises` with `isCustom: true`
+- [ ] Show custom exercises in library with a badge or indicator
+- **Why:** Serious lifters always have exercises not in any built-in library. This is a table-stakes feature.
+- **Files:** `src/pages/ExerciseLibrary.tsx`, `src/db/exerciseService.ts`, new form component
+- **Effort:** 1–2 days
+
+---
+
 ## Ideas / Backlog
 
 > Drop ideas here. We'll promote them to sections above when ready to tackle.
@@ -684,6 +800,15 @@
   - Build verified: no TypeScript errors
   - All 91 tests pass
 
+
+### 2026-03-14
+- **Opus UX Audit Complete**: Full end-to-end UX test across all 12 flows
+  - Audited: Onboarding, Home, Workout Logger, Set Logging, Finish Flow, History, Templates, Records, Coach, Analytics, More/Settings, Exercise Library
+  - Found 10 ranked issues (3 critical bugs, 4 serious, 3 moderate)
+  - Found 5 wins (rest timer, finish flow, readiness pulse, weekly view, AI workout suggestions)
+  - Added QF1–QF7 (quick fixes, each <1 hour) to plan.md
+  - Added BB1–BB6 (bigger bets, each 1–3 days) to plan.md
+  - Shipped all prior work to Vercel (A7, A8, A9, UXF6-7 + earlier UXF1-5)
 
 ### 2026-03-13
 - **BF1-BF10 Complete**: Full codebase bug fix pass (10 bugs fixed)
